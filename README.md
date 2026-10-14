@@ -19,6 +19,17 @@ No HTML. No `::preview` iframes. Just native, accessible data widgets that rende
 
 Rendered blocks are labeled by Hermes Desk as **Generated UI · Agent-provided data, not verified** — they are presentation, not proof.
 
+## How it works
+
+<p align="center">
+  <img src="docs/how-it-works.png" alt="How genui works pipeline" width="100%">
+</p>
+
+1. **Discovery:** The agent locates the deferred tool using `tool_search` and `tool_describe`.
+2. **Validation:** Payload is checked against the strict v1 schema, size limits (&le; 16 KB), and string sanitization rules.
+3. **Dispatch:** Hermes Desk executes the tool and mints a server-side `genuiOccurrence` token.
+4. **Rendering:** Native, accessible DOM cards render directly into the conversation stream with user-local checklist state.
+
 ## Install
 
 Copy `skills/genui/` into your Hermes skills directory:
@@ -53,7 +64,17 @@ Once installed, trigger it naturally:
 
 The skill enforces a strict v1 schema contract, hard caps (1–4 components per call, ≤ 4 calls per turn, ≤ 16,384 bytes), and a string validator that rejects markup, URLs, and control characters — so agents can't smuggle HTML or links into the rendered surface.
 
+## Example
+
+<p align="center">
+  <img src="docs/example.png" alt="genui payload to rendered UI example" width="100%">
+</p>
+
 ## Why "data-only"?
+
+<p align="center">
+  <img src="docs/why-to-use-it.png" alt="Why use genui bounded cards" width="100%">
+</p>
 
 Hermes Desk renders these widgets in a sandboxed native surface. The skill documents the exact constraints — no angle brackets, no URI schemes, no `genuiOccurrence` spoofing — so any agent using it stays inside the trust boundary. Checklist toggles are user-only local notes and never call back to the agent.
 
