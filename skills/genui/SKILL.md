@@ -1,6 +1,6 @@
 ---
 name: genui
-description: Use when rendering bounded, data-only UI (stat cards, tables, bar charts, checklists) in Hermes Desk via the mcp__hermes_desk__render_ui MCP tool.
+description: 'Use when asked to render bounded, data-only UI in Hermes Desk — the "genui" skill. Natural triggers: "genui", "render a table of ...", "render a stat card showing ...", "render a bar chart of ...", "render a checklist for ...". Renders stat, table, bar_chart and checklist widgets via the mcp__hermes_desk__render_ui MCP tool.'
 version: 1.0.0
 author: devgwardo
 license: MIT
