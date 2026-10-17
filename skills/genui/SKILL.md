@@ -179,6 +179,22 @@ Every string in every field is validated against a strict filter. Strings must *
 - Unicode control, format, bidi, or line/paragraph separator characters.
 - Empty or whitespace-only strings.
 
+Printable non-ASCII is **allowed**: accented Latin, CJK, and standalone emoji all pass — the banned character classes above are the only Unicode exclusions. Each example below is a JSON string literal:
+
+| JSON string literal | Allowed? | Why |
+|---|---|---|
+| `"Café Münster"` | allowed | accented Latin is printable |
+| `"任务完成"` | allowed | CJK is printable |
+| `"✅ Done"` | allowed | standalone emoji are printable (not control/format characters) |
+| `"<b>bold</b>"` | blocked | angle brackets are markup |
+| `"https://example.com"` | blocked | URI scheme |
+| `"//example.com"` | blocked | protocol-relative path |
+| `"Tab\there"` | blocked | tab is a control character (U+0009) |
+| `"a\u200Bb"` | blocked | zero-width space is a format character (U+200B) |
+| `"a\u202Eb"` | blocked | right-to-left override is a bidi character (U+202E) |
+| `"👨‍👩‍👧"` | blocked | this emoji is glued with zero-width joiners (U+200D, a format character) |
+| `"   "` | blocked | no visible character |
+
 ## Pruning Under the Byte Cap
 
 When your serialized argument exceeds the byte cap in `docs/contract.md`, apply these steps in order. Re-measure after each step and stop as soon as it fits. No step involves judgement; do not skip, reorder, or improvise steps.
