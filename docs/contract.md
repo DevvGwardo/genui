@@ -31,6 +31,22 @@ Consistency check: `node tools/check-bounds.mjs` extracts the bound tokens below
 | `checklist.items[].label` | 1–160 characters | Required. |
 | `checklist.items[].checked` | boolean | Optional. |
 
+## Version negotiation
+
+`version` is required and the only accepted value is `1` (`"const": 1` in `schema/v1.json`). There are no unversioned payloads and no default version: a payload that omits `version`, passes it as a string, or declares any other value is not a v1 payload.
+
+**v1 semantics.** The full payload is exactly an object with `version` pinned to 1 and a `components` array. Every bound in the table above, the string filter below, and the error rules in `docs/errors.md` belong to v1. Unknown keys anywhere in the payload are rejected.
+
+**Unknown-version fallback — what a caller must do.** When `version` is anything other than `1`:
+
+1. Do not dispatch the payload.
+2. Do not translate, downgrade, or strip fields to make it pass as v1.
+3. Tell the user which version the payload declared and that `render_ui` in this repo speaks v1 only.
+
+`SKILL.md` does not name a dedicated error code for an unknown `version`; the register in `docs/errors.md` records this rejection without guessing a code.
+
+**v2.** No v2 exists in this repo: no schema, no semantics, no compatibility promise. If a v2 ever ships, it must arrive as its own `schema/v2.json` (a new file, never an edit of v1) plus an update to this section in the same change; v1 payloads must keep validating against `schema/v1.json`. Until that change lands, a payload declaring a different `version` is out of contract for this repo and the fallback above applies.
+
 ## String filter (applies to every string field above)
 
 All strings must pass the runtime text filter. A string is rejected when it contains:
