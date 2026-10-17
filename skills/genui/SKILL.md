@@ -14,6 +14,20 @@ metadata:
 
 Use this skill to render native, accessible data cards directly inside a Hermes Desk conversation or shared room using the `mcp__hermes_desk__render_ui` MCP tool.
 
+## When to Use
+
+- The user explicitly invokes **genui**, or asks to render a card: "render a table of the queue bursts", "render a stat card for today's build time", "render a checklist for the release steps".
+- The user wants a compact, scannable summary that fits the card limits: a handful of headline numbers, a small comparison matrix, a few ranked bars, a short runbook checklist.
+- The user wants a checklist they can tick off locally while reading; toggles are user-local notes and never call back to you.
+- Every value can be written as a short plain string or a finite number, and the whole argument fits the v1 payload contract in `docs/contract.md`.
+
+## When NOT to Use
+
+- The content needs markup or links **inside the card** (badges, `<code>`, `https://...`): card strings reject angle brackets, URI schemes and protocol-relative paths — put links and formatting in your Markdown prose instead.
+- The content exceeds the card limits (a 40-row incident table, a 7-column comparison, a full report): write Markdown, or pre-aggregate into a smaller card.
+- The interaction must call back to you (a form, a button that triggers work, live-updating values): the only interactive element is the user-local checklist toggle; if that is not enough, say what you cannot do instead of faking it.
+- Hermes Desk is not available for the profile — the tool is missing from `tool_search` results, or the call returns `not_enabled` / `app_unavailable`: fix the profile first (see `docs/errors.md`), and never fake a rendered card.
+
 ## Prerequisites and Discovery
 
 1. **Profile enablement**: The active Hermes profile must have Hermes Desk MCP enabled in **Settings -> Workspace -> Agent browsing**. If calling `render_ui` returns `not_enabled: Browser control is not enabled for this profile`, `app_unavailable`, or `tool_search` finds no `mcp__hermes_desk__render_ui` tool in the current session, do not retry in a loop and **never** claim `render_ui` is unbuilt or emit `::preview{file="..."}` HTML files as a substitute. Explain that the profile must be enabled in **Settings -> Workspace -> Agent browsing** and its Hermes session restarted (`+ New chat`).
