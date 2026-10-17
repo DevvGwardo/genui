@@ -80,6 +80,83 @@ Every `render_ui` call must pass an exact `{ "version": 1, "components": [...] }
 }
 ```
 
+## Minimal Examples (one per widget type)
+
+Each payload below is a complete, valid `render_ui` argument, isolated to a single component. Copy and adapt one; validate against `schema/v1.json` before dispatch.
+
+**stat**
+
+```json
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "stat",
+      "title": "Build time",
+      "value": "3m 42s",
+      "detail": "p50 over the last 20 runs"
+    }
+  ]
+}
+```
+
+**table**
+
+```json
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "table",
+      "title": "Service status",
+      "columns": ["Service", "State"],
+      "rows": [
+        ["api", "ok"],
+        ["worker", "degraded"]
+      ]
+    }
+  ]
+}
+```
+
+**bar_chart**
+
+```json
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "bar_chart",
+      "title": "Queue depth by stage",
+      "unit": "jobs",
+      "items": [
+        { "label": "queued", "value": 12 },
+        { "label": "running", "value": 3 },
+        { "label": "failed", "value": 1 }
+      ]
+    }
+  ]
+}
+```
+
+**checklist**
+
+```json
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "checklist",
+      "title": "Release checklist",
+      "items": [
+        { "id": "run_tests", "label": "Run the focused test suite", "checked": true },
+        { "id": "tag_release", "label": "Tag the release", "checked": false }
+      ]
+    }
+  ]
+}
+```
+
 ## Hard Bounds and Text Restrictions
 
 - **Call and component caps**: Include 1 to 4 components per `render_ui` call, and make at most 4 `render_ui` calls per message or room turn. Total UTF-8 payload size must not exceed **16,384 bytes**.
