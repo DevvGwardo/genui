@@ -4,9 +4,26 @@
 
 # genui
 
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License: MIT"></a>
+  <a href="schema/v1.json"><img src="https://img.shields.io/badge/version-v1-blue" alt="Contract version: v1"></a>
+  <a href="https://github.com/DevvGwardo/genui/commits/main"><img src="https://img.shields.io/github/last-commit/DevvGwardo/genui" alt="Last commit"></a>
+</p>
+
 A [Hermes Agent](https://github.com/NousResearch/hermes-agent) skill for rendering bounded, data-only Generated UI cards — stat cards, tables, bar charts, and checklists — natively inside Hermes Desk conversations via the `mcp__hermes_desk__render_ui` MCP tool.
 
 No HTML. No `::preview` iframes. Just native, accessible data widgets that render straight into the chat surface.
+
+## Contents
+
+- [What it renders](#what-it-renders)
+- [How it works](#how-it-works)
+- [Install](#install)
+- [Prerequisites](#prerequisites)
+- [Usage](#usage)
+- [Example](#example)
+- [Why "data-only"?](#why-data-only)
+- [License](#license)
 
 ## What it renders
 
