@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/DevvGwardo/genui/main/schema/v1.json",
   "title": "Hermes Desk render_ui payload (v1)",
-  "description": "Strict v1 contract for the mcp__hermes_desk__render_ui call argument. Mirrors skills/genui/SKILL.md. The runtime rejects unknown keys, wrong types and any bound violation with error code bad_args.",
+  "description": "Strict v1 contract for the mcp__hermes_desk__render_ui call argument. Mirrors skills/genui/SKILL.md. Unknown keys, extra properties and invalid types are rejected with error code bad_args; see docs/errors.md for the full error register.",
   "type": "object",
   "required": ["version", "components"],
   "additionalProperties": false,
