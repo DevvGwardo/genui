@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "stat",
+      "title": "Open pull requests",
+      "value": "17",
+      "detail": "Across 6 repositories, 4 waiting on review"
+    }
+  ]
+}

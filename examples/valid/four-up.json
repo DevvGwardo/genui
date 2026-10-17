@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "stat",
+      "title": "Sprint velocity",
+      "value": "42 points",
+      "detail": "Average of the last 6 sprints"
+    },
+    {
+      "type": "table",
+      "title": "Open work by owner",
+      "columns": ["Owner", "Open", "Blocked"],
+      "rows": [
+        ["Ana", 7, 1],
+        ["Ben", 5, 2],
+        ["Chen", 9, 0]
+      ]
+    },
+    {
+      "type": "bar_chart",
+      "title": "Tickets closed per day",
+      "items": [
+        { "label": "Mon", "value": 12 },
+        { "label": "Tue", "value": 15 },
+        { "label": "Wed", "value": 9 }
+      ]
+    },
+    {
+      "type": "checklist",
+      "title": "Release steps",
+      "items": [
+        { "id": "tag", "label": "Tag the release", "checked": true },
+        { "id": "deploy", "label": "Deploy to staging", "checked": false }
+      ]
+    }
+  ]
+}
