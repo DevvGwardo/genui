@@ -147,13 +147,15 @@ The skill enforces a strict v1 schema contract, hard caps (1–4 components per 
   <img src="docs/why-to-use-it.png" alt="Why use genui bounded cards" width="100%">
 </p>
 
+*Design illustration. Measured equivalent: ≈73–78% fewer emitted bytes than equivalent styled HTML artifacts for the same content — see [`docs/context-reduction.md`](docs/context-reduction.md).*
+
 The comparison behind the data-only design — arbitrary HTML/iframe rendering versus bounded, data-only native cards:
 
 | Arbitrary HTML & iframes (vulnerable & fragile) | genui bounded native cards (sandboxed & deterministic) |
 |---|---|
 | **XSS & injection surface** — the model can hallucinate malicious scripts, iframe navigations, or phishing links into the client window. | **Zero-injection trust boundary** — the strict parser filters angle brackets, control characters, and URI schemes, so only plain data reaches the DOM. |
 | **CSS hallucination & broken themes** — agents spend tokens writing fragile CSS that clashes with dark mode and overflows. | **Native Hermes Desk design system** — cards use the desk's own tokens and layouts, with no agent CSS to clash with the theme. |
-| **Heavy multi-process webview overhead** — a separate renderer context per iframe, adding significant memory overhead and laggy scrolling. | **Compact by construction** — agents emit compact, schema-validated JSON instead of verbose HTML tables and custom styling; the project targets a substantial token reduction versus HTML-based rendering. |
+| **Heavy multi-process webview overhead** — a separate renderer context per iframe, adding significant memory overhead and laggy scrolling. | **Compact by construction** — agents emit compact, schema-validated JSON instead of verbose HTML tables and custom styling; the measured token reduction is ≈73% versus a typically styled equivalent HTML artifact for the same content (≈78% richly styled; UTF-8 bytes — see [`docs/context-reduction.md`](docs/context-reduction.md)). |
 | **No native state or accessibility** — buttons and toggles break or need costly model round-trips for trivial interactions. | **Zero-token user-local checklists** — checkbox state persists in local client storage; toggling never calls back to the agent. |
 
 Hermes Desk renders these widgets in a sandboxed native surface, and the skill documents the exact constraints — no angle brackets, no URI schemes, no `genuiOccurrence` spoofing — so any agent using it stays inside the trust boundary.
