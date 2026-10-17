@@ -179,6 +179,17 @@ Every string in every field is validated against a strict filter. Strings must *
 - Unicode control, format, bidi, or line/paragraph separator characters.
 - Empty or whitespace-only strings.
 
+## Pitfalls
+
+- **Markup or links inside card strings.** Failure: strings such as `<b>` and `https://...` are rejected by the text filter, so the call fails and the turn is wasted. Fix: keep card strings plain; put links and formatting in your surrounding Markdown prose.
+- **Row/column mismatch in a table.** Failure: a row whose cell count differs from `columns` is rejected by the runtime — the schema cannot express this rule (see `docs/contract.md`) — after you have already spent the call. Fix: count cells per row before dispatch, and keep tables small enough to eyeball.
+- **Retry storm on `not_enabled` / `app_unavailable`.** Failure: the profile has Hermes Desk MCP disabled, the call keeps failing, and retrying burns turns; faking a card with `::preview` HTML is explicitly forbidden. Fix: enable **Settings -> Workspace -> Agent browsing**, restart the Hermes session (`+ New chat`), and tell the user; do not retry in a loop.
+- **Duplicate checklist `id`s.** Failure: ids must be unique within a component; duplicates are rejected, and the runtime does not document a code for this rejection (see `docs/errors.md`), so it is easy to miss. Fix: derive each id from its label and check uniqueness before dispatch.
+- **Payload over the byte cap.** Failure: `too_large` when the serialized argument outgrows the cap in `docs/contract.md` — usually caused by stacking large tables into one call. Fix: prune components, rows, or cells until the serialized argument fits; measure the serialized argument, not the source text.
+- **Treating the card as verified data.** Failure: the block is labeled **Generated UI · Agent-provided data, not verified**; quoting it as evidence — or assuming the user's checklist toggles notify you — is wrong, because toggles are user-local and never call back. Fix: keep verification in your own tool work, present cards as summaries, and never wait for a toggle.
+- **Wrong or omitted `version`.** Failure: the payload is rejected, and mangling a newer-version payload into v1 is explicitly forbidden (see Version negotiation in `docs/contract.md`). Fix: send exactly the v1 shape; if the payload's version is unknown, stop and say so.
+- **Spoofing `genuiOccurrence`.** Failure: including it in tool arguments does nothing except taint the call — Hermes Desk mints it server-side on completion. Fix: never send it; if you need to reference a rendered block, describe it in prose.
+
 ## Interaction Semantics
 
 - Hermes Desk labels rendered blocks as **Generated UI · Agent-provided data, not verified**.
