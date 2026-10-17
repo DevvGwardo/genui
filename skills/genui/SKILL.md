@@ -190,6 +190,22 @@ Every string in every field is validated against a strict filter. Strings must *
 - **Wrong or omitted `version`.** Failure: the payload is rejected, and mangling a newer-version payload into v1 is explicitly forbidden (see Version negotiation in `docs/contract.md`). Fix: send exactly the v1 shape; if the payload's version is unknown, stop and say so.
 - **Spoofing `genuiOccurrence`.** Failure: including it in tool arguments does nothing except taint the call — Hermes Desk mints it server-side on completion. Fix: never send it; if you need to reference a rendered block, describe it in prose.
 
+## Pre-flight Self-check
+
+Run this list against the exact JSON you are about to send. Each line names the rejection it prevents.
+
+- [ ] `version` is exactly 1 — rejected otherwise by: `const` and `required`.
+- [ ] Root keys are only `version` and `components` — rejected otherwise by: `additionalProperties`.
+- [ ] Component count is within the call cap — rejected otherwise by: `minItems` / `maxItems`.
+- [ ] Every component has `type` and `title`, plus its widget's required fields — rejected otherwise by: `required`.
+- [ ] Every `type` is one of `stat`, `table`, `bar_chart`, `checklist` — rejected otherwise by: `oneOf` / `const`.
+- [ ] Every string is non-empty, not whitespace-only, and within its length cap — rejected otherwise by: `minLength` / `maxLength` / `pattern` (`\S`).
+- [ ] No string contains angle brackets, URI schemes, protocol-relative paths, or control/format/bidi/line characters — rejected otherwise by: `not` + `pattern`.
+- [ ] Numbers are finite and within their ranges — rejected otherwise by: `minimum` / `maximum` / `anyOf`.
+- [ ] Every table row has exactly as many cells as `columns` — rejected otherwise by: runtime rule (schema cannot express it; see `docs/contract.md`).
+- [ ] Checklist `id`s match the id pattern and are unique within their component — rejected otherwise by: `pattern` plus a runtime uniqueness rule (see `docs/errors.md`).
+- [ ] The serialized payload is within the byte cap — rejected otherwise by: runtime rule (`too_large`; see `docs/contract.md`).
+
 ## Interaction Semantics
 
 - Hermes Desk labels rendered blocks as **Generated UI · Agent-provided data, not verified**.
