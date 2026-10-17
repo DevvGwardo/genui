@@ -17,4 +17,4 @@ Consistency check: `node tools/check-errors.mjs` scans the repo for error-shaped
 
 Also: never substitute a rendered card with `::preview` HTML files, and never retry `not_enabled` / `app_unavailable` in a loop — see `skills/genui/SKILL.md`.
 
-Executable fixtures: `examples/invalid/` holds one deliberately invalid payload for every rejection class above; its `manifest.json` names each file's expected code and marks the three classes whose code is not named (never guessed — the F1 live check records them).
+Executable fixtures: `examples/invalid/` holds one deliberately invalid payload for every rejection class above; its `manifest.json` names each file's expected code and marks the three classes whose code is not named (never guessed — the F1 live check records them). Payload files are checked by `tools/validate.py`, which reports these codes and prints `code=none` where no code is named.

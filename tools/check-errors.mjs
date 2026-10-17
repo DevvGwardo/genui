@@ -20,15 +20,17 @@ const TOKEN = /\b[a-z]{3,}_[a-z]{3,}\b/g;
 const TEXT_EXTENSIONS = new Set([".md", ".json", ".mjs", ".js", ".py", ".yml", ".yaml"]);
 const SKIP_DIRS = new Set([".git", "node_modules"]);
 
-// Identifiers that are not error codes: interface names and well-known
-// filesystem names. Keep this list short and boring; growing it should be a
-// deliberate, reviewed act.
+// Identifiers that are not error codes: interface names, standard-library
+// keywords, and well-known filesystem names. Keep this list short and boring;
+// growing it should be a deliberate, reviewed act.
 const NON_ERROR_TOKENS = new Set([
   "tool_search",
   "tool_describe",
   "tool_call",
   "bar_chart",
   "node_modules",
+  // stdlib JSON keyword used by tools/validate.py for exact byte sizing
+  "ensure_ascii",
 ]);
 
 const MIN_DECLARED = 4; // sanity floor: the four canonical codes
