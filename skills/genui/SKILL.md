@@ -85,4 +85,4 @@ Every `render_ui` call must pass an exact `{ "version": 1, "components": [...] }
 
 - Hermes Desk labels rendered blocks as **Generated UI · Agent-provided data, not verified**.
 - Checklist checkboxes are **user-only local notes** stored in the user's local app storage (scoped to the conversation, profile, tool call, server-issued `genuiOccurrence`, and payload revision). Toggling a checkbox never sends a callback or follow-up turn to the agent.
-- Do not include `genuiOccurrence` in tool arguments; the desktop dispatch mints it on completion.
+- Do not include `genuiOccurrence` in tool arguments; Hermes Desk mints it on completion.

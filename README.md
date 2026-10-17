@@ -50,7 +50,7 @@ Restart your Hermes session (`+ New chat` in Hermes Desk) so the skill loader pi
 
 ## Prerequisites
 
-- A Hermes Desk profile with **Settings → Workspace → Agent browsing** enabled (this is what exposes `mcp__hermes_desk__render_ui`).
+- A Hermes profile with **Settings → Workspace → Agent browsing** enabled (this is what exposes `mcp__hermes_desk__render_ui`).
 - Tool search enabled (`tools.tool_search.enabled: auto`) so the deferred MCP schema can be discovered — the skill includes the exact `tool_search` → `tool_describe` → invoke sequence.
 
 ## Usage
