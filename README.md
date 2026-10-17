@@ -21,6 +21,7 @@ No HTML. No `::preview` iframes. Just native, accessible data widgets that rende
 - [Install](#install)
 - [Prerequisites](#prerequisites)
 - [Usage](#usage)
+- [Troubleshooting](#troubleshooting)
 - [Example](#example)
 - [Why "data-only"?](#why-data-only)
 - [License](#license)
@@ -67,6 +68,22 @@ cp -r genui/skills/genui ~/.hermes/profiles/<your-profile>/skills/
 
 Restart your Hermes session (`+ New chat` in Hermes Desk) so the skill loader picks it up.
 
+### Verify the install
+
+```bash
+test -f ~/.hermes/skills/desktop-ui/genui/SKILL.md && echo "genui skill installed"
+```
+
+Profile-scoped installs: use `~/.hermes/profiles/<your-profile>/skills/genui/SKILL.md` instead of the path above. Then restart the session and ask for a card — for example, *"genui: render a stat card showing the current sprint velocity"*. If a card renders, the install is complete.
+
+### Uninstall
+
+```bash
+rm -rf ~/.hermes/skills/desktop-ui/genui
+```
+
+Profile-scoped installs: `rm -rf ~/.hermes/profiles/<your-profile>/skills/genui`. Restart the session so the skill unloads.
+
 ## Prerequisites
 
 - A Hermes profile with **Settings → Workspace → Agent browsing** enabled (this is what exposes `mcp__hermes_desk__render_ui`).
@@ -82,6 +99,17 @@ Once installed, trigger it naturally:
 - *"render a checklist for …"*
 
 The skill enforces a strict v1 schema contract, hard caps (1–4 components per call, ≤ 4 calls per turn, ≤ 16,384 bytes), and a string validator that rejects markup, URLs, and control characters — so agents can't smuggle HTML or links into the rendered surface.
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| The call fails with `not_enabled` or `app_unavailable` | Hermes Desk MCP is disabled for the active profile | Enable **Settings → Workspace → Agent browsing** and restart the session (`+ New chat`); the skill's Pitfalls list covers this. |
+| The agent can't find `render_ui` at all | The skill folder is not in a path this profile's loader scans | Confirm the files landed: `test -f ~/.hermes/skills/desktop-ui/genui/SKILL.md && echo found` — and check that tool search is enabled (`tools.tool_search.enabled: auto`). |
+| The call is rejected with `bad_args` | The payload violated a bound or the string filter | Walk SKILL.md's "Pre-flight Self-check" and fix the field it flags. |
+| The call is rejected with `too_large` | The serialized payload is over the byte cap | Apply the ordered rules in SKILL.md's "Pruning Under the Byte Cap", then retry. |
+| Checkboxes reset, or don't appear on your other device | By design: toggles are user-local notes kept in local storage | No fix needed — they never sync and never call back to the agent. |
+| Card text looks unformatted | By design: card fields are plain text only | Put links and formatting in your surrounding message; keep card fields plain. |
 
 ## Example
 
