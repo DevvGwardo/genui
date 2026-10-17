@@ -157,20 +157,27 @@ Each payload below is a complete, valid `render_ui` argument, isolated to a sing
 }
 ```
 
-## Hard Bounds and Text Restrictions
+## Quick Reference
 
-- **Call and component caps**: Include 1 to 4 components per `render_ui` call, and make at most 4 `render_ui` calls per message or room turn. Total UTF-8 payload size must not exceed **16,384 bytes**.
-- **Plain data labels only (no markup or URLs)**: Every string is validated against a strict filter. Strings must **never** contain:
-  - Angle brackets (`<` or `>`) or HTML/XML tags.
-  - URI schemes (`http:`, `https:`, `file:`, `data:`, `javascript:`, `vbscript:`) or protocol-relative paths (`//domain`). Put URLs in your surrounding Markdown prose, never inside `render_ui` fields.
-  - Unicode control, format, bidi, or line/paragraph separator characters.
-  - Empty or whitespace-only strings.
-- **Per-widget limits**:
-  - `title`: 1 to 80 characters on every component.
-  - `stat`: `value` (1 to 80 chars, required), `detail` (1 to 160 chars, optional).
-  - `table`: `columns` (1 to 6 strings, 1 to 60 chars each), `rows` (0 to 20 rows). Every row must have the **exact same length** as `columns`. Cells may be strings (1 to 160 chars) or finite numbers in `[-1e12, 1e12]`.
-  - `bar_chart`: `items` (1 to 12 items), each with `label` (1 to 80 chars) and finite non-negative `value` in `[0, 1e12]`. Optional `unit` (1 to 40 chars).
-  - `checklist`: `items` (1 to 20 items), each with a **unique** `id` matching `^[a-zA-Z0-9_-]{1,40}$`, `label` (1 to 160 chars), and optional boolean `checked`.
+One table; the full bound set is defined once in `docs/contract.md` (single source of truth) and enforced by `schema/v1.json`.
+
+| Widget | Required fields | Caps |
+|---|---|---|
+| *(every component)* | `type`, `title` | `title`: 1–80 characters |
+| *(every call)* | `version`, `components` | 1–4 components per `render_ui` call; at most 4 calls per message or room turn; serialized payload must not exceed 16,384 bytes |
+| `stat` | `type`, `title`, `value` | `value`: 1–80 characters; optional `detail`: 1–160 characters |
+| `table` | `type`, `title`, `columns`, `rows` | `columns`: 1–6 strings of 1–60 characters; `rows`: 0–20 rows, each with exactly `columns.length` cells; each cell is 1–160 characters or a finite number in [-1e12, 1e12] |
+| `bar_chart` | `type`, `title`, `items` | `items`: 1–12 items; `label`: 1–80 characters; `value`: a finite non-negative number in [0, 1e12]; optional `unit`: 1–40 characters |
+| `checklist` | `type`, `title`, `items` | `items`: 1–20 items; `label`: 1–160 characters; `id` must be unique and match `^[a-zA-Z0-9_-]{1,40}$`; optional boolean `checked` |
+
+## Text Restrictions (every string)
+
+Every string in every field is validated against a strict filter. Strings must **never** contain:
+
+- Angle brackets (`<` or `>`) or HTML/XML tags.
+- URI schemes (`http:`, `https:`, `file:`, `data:`, `javascript:`, `vbscript:`) or protocol-relative paths (`//domain`). Put URLs in your surrounding Markdown prose, never inside `render_ui` fields.
+- Unicode control, format, bidi, or line/paragraph separator characters.
+- Empty or whitespace-only strings.
 
 ## Interaction Semantics
 
