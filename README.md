@@ -25,10 +25,12 @@ Rendered blocks are labeled by Hermes Desk as **Generated UI · Agent-provided d
   <img src="docs/how-it-works.png" alt="How genui works pipeline" width="100%">
 </p>
 
-1. **Discovery:** The agent locates the deferred tool using `tool_search` and `tool_describe`.
-2. **Validation:** Payload is checked against the strict v1 schema, size limits (&le; 16 KB), and string sanitization rules.
-3. **Dispatch:** Hermes Desk executes the tool and mints a server-side `genuiOccurrence` token.
-4. **Rendering:** Native, accessible DOM cards render directly into the conversation stream with user-local checklist state.
+From a user prompt to sandboxed native desktop UI, in four steps:
+
+1. **Discovery:** The agent locates the deferred tool using `tool_search` and `tool_describe`, so the schema stays out of the context window by default.
+2. **Validation:** Payload is checked against the strict v1 schema, size limits (&le; 16 KB), and string sanitization rules — no HTML tags or URLs allowed.
+3. **Dispatch:** Hermes Desk executes the tool and mints a server-side `genuiOccurrence` token, preventing state spoofing.
+4. **Rendering:** Native, accessible DOM cards render directly into the conversation stream; checklist state is stored locally as user-local notes.
 
 ## Install
 
@@ -76,7 +78,16 @@ The skill enforces a strict v1 schema contract, hard caps (1–4 components per 
   <img src="docs/why-to-use-it.png" alt="Why use genui bounded cards" width="100%">
 </p>
 
-Hermes Desk renders these widgets in a sandboxed native surface. The skill documents the exact constraints — no angle brackets, no URI schemes, no `genuiOccurrence` spoofing — so any agent using it stays inside the trust boundary. Checklist toggles are user-only local notes and never call back to the agent.
+The comparison behind the data-only design — arbitrary HTML/iframe rendering versus bounded, data-only native cards:
+
+| Arbitrary HTML & iframes (vulnerable & fragile) | genui bounded native cards (sandboxed & deterministic) |
+|---|---|
+| **XSS & injection surface** — the model can hallucinate malicious scripts, iframe navigations, or phishing links into the client window. | **Zero-injection trust boundary** — the strict parser filters angle brackets, control characters, and URI schemes, so only plain data reaches the DOM. |
+| **CSS hallucination & broken themes** — agents spend tokens writing fragile CSS that clashes with dark mode and overflows. | **Native Hermes Desk design system** — cards use the desk's own tokens and layouts, with no agent CSS to clash with the theme. |
+| **Heavy multi-process webview overhead** — a separate renderer context per iframe, adding significant memory overhead and laggy scrolling. | **Compact by construction** — agents emit compact, schema-validated JSON instead of verbose HTML tables and custom styling; the project targets a substantial token reduction versus HTML-based rendering. |
+| **No native state or accessibility** — buttons and toggles break or need costly model round-trips for trivial interactions. | **Zero-token user-local checklists** — checkbox state persists in local client storage; toggling never calls back to the agent. |
+
+Hermes Desk renders these widgets in a sandboxed native surface, and the skill documents the exact constraints — no angle brackets, no URI schemes, no `genuiOccurrence` spoofing — so any agent using it stays inside the trust boundary.
 
 ## License
 
