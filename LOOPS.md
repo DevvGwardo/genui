@@ -7,7 +7,7 @@ Ranks are the backlog order. Status values: `todo` | `done` | `blocked-verify` |
 
 | ID | Rank | Area | Task | Acceptance | Status | Date | Evidence | Commit |
 |---|---|---|---|---|---|---|---|---|
-| A1 | 1 | Contract | Author `schema/v1.json` (JSON Schema 2020-12): all 4 widget types, every bound, `additionalProperties: false`. | Schema accepts a 4-component payload; rejects an unknown key. | done | 2026-10-17 | `node check-v1.mjs schema/v1.json` → 34/34 cases; accepts 4-component payload = true; rejects unknown key = true (ajv 8.17.1, draft 2020-12) | |
+| A1 | 1 | Contract | Author `schema/v1.json` (JSON Schema 2020-12): all 4 widget types, every bound, `additionalProperties: false`. | Schema accepts a 4-component payload; rejects an unknown key. | done | 2026-10-17 | `node check-v1.mjs schema/v1.json` → 34/34 cases; accepts 4-component payload = true; rejects unknown key = true (ajv 8.17.1, draft 2020-12) | 738bd72 |
 | A2 | 2 | Contract | Single source of truth for all numeric/char bounds (`docs/contract.md`). | Diff of SKILL.md bounds vs table is empty. | todo | | | |
 | A3 | 3 | Contract | Error → cause → fix table for `bad_args`, `not_enabled`, `app_unavailable`, `too_large`, unknown type, duplicate checklist id. | Every error named anywhere in the repo appears in the table. | todo | | | |
 | A4 | 4 | Contract | Version negotiation: v1 semantics + unknown-version fallback. | Section exists; no ambiguity remains about v2 behavior. | todo | | | |
