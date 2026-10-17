@@ -179,13 +179,26 @@ Every string in every field is validated against a strict filter. Strings must *
 - Unicode control, format, bidi, or line/paragraph separator characters.
 - Empty or whitespace-only strings.
 
+## Pruning Under the Byte Cap
+
+When your serialized argument exceeds the byte cap in `docs/contract.md`, apply these steps in order. Re-measure after each step and stop as soon as it fits. No step involves judgement; do not skip, reorder, or improvise steps.
+
+1. **Measure.** Serialize the exact argument you intend to send (compact UTF-8, no pretty-printing) and count its bytes; never estimate from the source text. If it already fits, send it.
+2. **Drop optional fields.** Remove every non-required field, in this order, re-measuring after each: all `detail` fields, then all `unit` fields, then all `checked` fields.
+3. **Drop trailing rows.** While still over, remove the last row of the table with the most rows (tied: the table appearing later in `components`). Tables may shrink to zero rows.
+4. **Drop trailing items.** While still over, remove the last item of the longest item list (`bar_chart` or `checklist`; tied: the component appearing later in `components`). Item lists may shrink to a single item, never fewer.
+5. **Drop whole components.** While still over, remove the last component in `components`. Keep at least one component; order components by importance before dispatch, most important first.
+6. **Stop and report.** If a single minimal component is still over the cap, send nothing; tell the user the data does not fit one card call, and suggest sending it across several messages (each call within the cap) or narrowing the data.
+
+Never truncate a string or a number, and never silently change a value, to make room — dropping is the only pruning move.
+
 ## Pitfalls
 
 - **Markup or links inside card strings.** Failure: strings such as `<b>` and `https://...` are rejected by the text filter, so the call fails and the turn is wasted. Fix: keep card strings plain; put links and formatting in your surrounding Markdown prose.
 - **Row/column mismatch in a table.** Failure: a row whose cell count differs from `columns` is rejected by the runtime — the schema cannot express this rule (see `docs/contract.md`) — after you have already spent the call. Fix: count cells per row before dispatch, and keep tables small enough to eyeball.
 - **Retry storm on `not_enabled` / `app_unavailable`.** Failure: the profile has Hermes Desk MCP disabled, the call keeps failing, and retrying burns turns; faking a card with `::preview` HTML is explicitly forbidden. Fix: enable **Settings -> Workspace -> Agent browsing**, restart the Hermes session (`+ New chat`), and tell the user; do not retry in a loop.
 - **Duplicate checklist `id`s.** Failure: ids must be unique within a component; duplicates are rejected, and the runtime does not document a code for this rejection (see `docs/errors.md`), so it is easy to miss. Fix: derive each id from its label and check uniqueness before dispatch.
-- **Payload over the byte cap.** Failure: `too_large` when the serialized argument outgrows the cap in `docs/contract.md` — usually caused by stacking large tables into one call. Fix: prune components, rows, or cells until the serialized argument fits; measure the serialized argument, not the source text.
+- **Payload over the byte cap.** Failure: `too_large` when the serialized argument outgrows the cap in `docs/contract.md` — usually caused by stacking large tables into one call. Fix: apply the ordered drop rules in **Pruning Under the Byte Cap** and re-measure after each step.
 - **Treating the card as verified data.** Failure: the block is labeled **Generated UI · Agent-provided data, not verified**; quoting it as evidence — or assuming the user's checklist toggles notify you — is wrong, because toggles are user-local and never call back. Fix: keep verification in your own tool work, present cards as summaries, and never wait for a toggle.
 - **Wrong or omitted `version`.** Failure: the payload is rejected, and mangling a newer-version payload into v1 is explicitly forbidden (see Version negotiation in `docs/contract.md`). Fix: send exactly the v1 shape; if the payload's version is unknown, stop and say so.
 - **Spoofing `genuiOccurrence`.** Failure: including it in tool arguments does nothing except taint the call — Hermes Desk mints it server-side on completion. Fix: never send it; if you need to reference a rendered block, describe it in prose.
