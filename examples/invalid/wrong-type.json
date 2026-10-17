@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "stat",
+      "title": "Deploys today",
+      "value": 3
+    }
+  ]
+}

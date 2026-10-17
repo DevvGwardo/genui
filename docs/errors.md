@@ -16,3 +16,5 @@ Consistency check: `node tools/check-errors.mjs` scans the repo for error-shaped
 | not named in `SKILL.md` | Duplicate checklist `id` | Two or more items in one checklist component share an `id`; ids must be unique within the component. | Make ids unique before dispatch (they must also match `^[a-zA-Z0-9_-]{1,40}$` — see `docs/contract.md`). Record the runtime's code here after a live check (F1). |
 
 Also: never substitute a rendered card with `::preview` HTML files, and never retry `not_enabled` / `app_unavailable` in a loop — see `skills/genui/SKILL.md`.
+
+Executable fixtures: `examples/invalid/` holds one deliberately invalid payload for every rejection class above; its `manifest.json` names each file's expected code and marks the three classes whose code is not named (never guessed — the F1 live check records them).
