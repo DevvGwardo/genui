@@ -1,4 +1,5 @@
 <p align="center">
+  <img src="docs/logo.webp" alt="genui logo" width="120"><br>
   <img src="docs/repo-banner.webp" alt="genui skill banner" width="100%">
 </p>
 
