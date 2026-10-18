@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "stat",
+      "title": "Tag character in a string value",
+      "value": "Build \udb40\udc41 passed",
+      "detail": "U+E0041 is an astral-plane tag character; the value is visually identical to 'Build  passed'"
+    }
+  ]
+}

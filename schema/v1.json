@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/DevvGwardo/genui/main/schema/v1.json",
+  "title": "Hermes Desk render_ui payload (v1)",
+  "description": "Strict v1 contract for the mcp__hermes_desk__render_ui call argument. Mirrors skills/genui/SKILL.md. Unknown keys, extra properties and invalid types are rejected with error code bad_args; see docs/errors.md for the full error register.",
+  "type": "object",
+  "required": ["version", "components"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": 1,
+      "description": "Schema version. Only 1 is accepted."
+    },
+    "components": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/stat" },
+          { "$ref": "#/$defs/table" },
+          { "$ref": "#/$defs/bar_chart" },
+          { "$ref": "#/$defs/checklist" }
+        ]
+      }
+    }
+  },
+  "$comment": "Rules the runtime enforces that JSON Schema cannot express: (1) total payload must not exceed 16,384 UTF-8 bytes (error code too_large); (2) every table row length must equal the columns length; (3) checklist item ids must be unique within a component; (4) the astral-plane format characters listed in $defs/plainText are rejected by the text filter (portable ECMA-262 patterns cannot match them). tools/validate.py mirrors all four.",
+  "$defs": {
+    "plainText": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Any string that survives the runtime text filter: no angle brackets or markup, no URI schemes, no protocol-relative paths, no control/format/bidi/line-separator characters, and not whitespace-only.",
+      "pattern": "\\S",
+      "not": {
+        "anyOf": [
+          { "pattern": "[<>]" },
+          { "pattern": "//" },
+          { "pattern": "(?:[hH][tT][tT][pP][sS]?|[fF][iI][lL][eE]|[dD][aA][tT][aA]|[jJ][aA][vV][aA][sS][cC][rR][iI][pP][tT]|[vV][bB][sS][cC][rR][iI][pP][tT]):" },
+          { "pattern": "[\\u0000-\\u001F\\u007F-\\u009F\\u00AD\\u0600-\\u0605\\u061C\\u06DD\\u070F\\u0890-\\u0891\\u08E2\\u180E\\u200B-\\u200F\\u2028-\\u202E\\u2060-\\u2064\\u2066-\\u206F\\uFEFF\\uFFF9-\\uFFFB]" }
+        ]
+      },
+      "$comment": "The scheme alternation is case-insensitive per RFC 3986 (URI schemes are case-insensitive; 'HTTP:' is still a URI). Astral-plane format characters (U+110BD, U+110CD, U+13430-U+1343F, U+1BCA0-U+1BCA3, U+1D173-U+1D17A, U+E0001, U+E0020-U+E007F) are additionally rejected by the runtime and by tools/validate.py; ECMA-262 patterns without the u flag cannot express them portably."
+    },
+    "text40": {
+      "type": "string",
+      "allOf": [
+        { "$ref": "#/$defs/plainText" },
+        { "maxLength": 40 }
+      ]
+    },
+    "text60": {
+      "type": "string",
+      "allOf": [
+        { "$ref": "#/$defs/plainText" },
+        { "maxLength": 60 }
+      ]
+    },
+    "text80": {
+      "type": "string",
+      "allOf": [
+        { "$ref": "#/$defs/plainText" },
+        { "maxLength": 80 }
+      ]
+    },
+    "text160": {
+      "type": "string",
+      "allOf": [
+        { "$ref": "#/$defs/plainText" },
+        { "maxLength": 160 }
+      ]
+    },
+    "cell": {
+      "description": "A table cell: a string of 1 to 160 characters, or a finite number in [-1e12, 1e12].",
+      "anyOf": [
+        { "$ref": "#/$defs/text160" },
+        { "type": "number", "minimum": -1e12, "maximum": 1e12 }
+      ]
+    },
+    "stat": {
+      "type": "object",
+      "required": ["type", "title", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "stat" },
+        "title": { "$ref": "#/$defs/text80" },
+        "value": { "$ref": "#/$defs/text80" },
+        "detail": { "$ref": "#/$defs/text160" }
+      }
+    },
+    "table": {
+      "type": "object",
+      "required": ["type", "title", "columns", "rows"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "table" },
+        "title": { "$ref": "#/$defs/text80" },
+        "columns": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "items": { "$ref": "#/$defs/text60" }
+        },
+        "rows": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 20,
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/cell" },
+            "$comment": "The runtime additionally requires each row length to equal the columns length."
+          }
+        }
+      }
+    },
+    "bar_chart": {
+      "type": "object",
+      "required": ["type", "title", "items"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "bar_chart" },
+        "title": { "$ref": "#/$defs/text80" },
+        "unit": { "$ref": "#/$defs/text40" },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "required": ["label", "value"],
+            "additionalProperties": false,
+            "properties": {
+              "label": { "$ref": "#/$defs/text80" },
+              "value": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1e12
+              }
+            }
+          }
+        }
+      }
+    },
+    "checklist": {
+      "type": "object",
+      "required": ["type", "title", "items"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "checklist" },
+        "title": { "$ref": "#/$defs/text80" },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "items": {
+            "type": "object",
+            "required": ["id", "label"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9_-]{1,40}$"
+              },
+              "label": { "$ref": "#/$defs/text160" },
+              "checked": { "type": "boolean" }
+            }
+          },
+          "$comment": "The runtime additionally requires ids to be unique within this array (JSON Schema cannot express uniqueness by property)."
+        }
+      }
+    }
+  }
+}

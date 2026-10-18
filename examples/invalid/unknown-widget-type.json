@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "gauge",
+      "title": "Coverage",
+      "value": "87%"
+    }
+  ]
+}

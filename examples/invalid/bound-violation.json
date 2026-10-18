@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "table",
+      "title": "Seven columns over the six-column bound",
+      "columns": ["A", "B", "C", "D", "E", "F", "G"],
+      "rows": [["1", "2", "3", "4", "5", "6", "7"]]
+    }
+  ]
+}

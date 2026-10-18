@@ -1,0 +1,11 @@
+{
+  "note": "Boundary fixtures for the v1 contract limits; tools/check-examples.py asserts each case's declared outcome in CI. `expect` is valid or invalid; `bytes`, when present, is the exact compact UTF-8 size of the payload as the validator measures it (json.dumps with compact separators, UTF-8), and the runner re-asserts it. The 16,384-byte case proves the cap is inclusive (the runtime check is '> 16384'), and the 16,385-byte case proves one byte over is rejected with too_large. The 6x20 table maximum is examples/valid/table-boundary.json, referenced here rather than duplicated.",
+  "cases": [
+    { "file": "table-empty-rows.json", "expect": "valid", "label": "table with 0 rows (documented minimum)" },
+    { "file": "../valid/table-boundary.json", "expect": "valid", "label": "table at 6 columns x 20 rows (documented maximum)" },
+    { "file": "bar-chart-12-items.json", "expect": "valid", "label": "bar_chart with 12 items (documented maximum)" },
+    { "file": "checklist-20-items.json", "expect": "valid", "label": "checklist with 20 items (documented maximum)" },
+    { "file": "payload-16384-bytes.json", "expect": "valid", "label": "payload at exactly the 16,384-byte cap", "bytes": 16384 },
+    { "file": "payload-16385-bytes.json", "expect": "invalid", "label": "payload one byte over the cap", "bytes": 16385, "code": "too_large", "reason": "over byte cap" }
+  ]
+}

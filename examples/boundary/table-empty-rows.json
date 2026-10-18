@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "table",
+      "title": "Incidents this week",
+      "columns": [
+        "Service",
+        "Severity",
+        "Status"
+      ],
+      "rows": []
+    }
+  ]
+}

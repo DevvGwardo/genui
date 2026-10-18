@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "bar_chart",
+      "title": "Tickets closed per day",
+      "unit": "tickets",
+      "items": [
+        { "label": "Mon", "value": 12 },
+        { "label": "Tue", "value": 15 },
+        { "label": "Wed", "value": 9 },
+        { "label": "Thu", "value": 17 },
+        { "label": "Fri", "value": 14 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "checklist",
+      "title": "Release steps",
+      "items": [
+        { "id": "deploy", "label": "Deploy to staging", "checked": true },
+        { "id": "deploy", "label": "Deploy to production", "checked": false }
+      ]
+    }
+  ]
+}

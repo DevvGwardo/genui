@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "stat",
+      "title": "Version two payload",
+      "value": "2"
+    }
+  ]
+}

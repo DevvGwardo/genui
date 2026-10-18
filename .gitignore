@@ -1,0 +1,6 @@
+# Python bytecode caches (the tools/ checkers run under a plain python3)
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store

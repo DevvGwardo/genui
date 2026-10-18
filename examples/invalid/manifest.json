@@ -1,0 +1,13 @@
+{
+  "note": "One deliberately invalid payload per rejection class. expectedCode is the code named in docs/errors.md for that rejection, or null when the rejection is documented but no code is named in v1 docs - null codes are never guessed; the F1 live check records what the runtime reports. kind is the label the acceptance checker asserts, so each fixture must fail for exactly its own reason, not just any reason.",
+  "cases": [
+    { "file": "extra-property.json", "expectedCode": "bad_args", "kind": "extra property" },
+    { "file": "unknown-widget-type.json", "expectedCode": "bad_args", "kind": "unknown widget type" },
+    { "file": "wrong-type.json", "expectedCode": "bad_args", "kind": "invalid type" },
+    { "file": "too-large-payload.json", "expectedCode": "too_large", "kind": "over byte cap" },
+    { "file": "bound-violation.json", "expectedCode": null, "kind": "bound violation" },
+    { "file": "unknown-version.json", "expectedCode": null, "kind": "unknown version" },
+    { "file": "duplicate-checklist-id.json", "expectedCode": null, "kind": "duplicate id" },
+    { "file": "astral-format-char.json", "expectedCode": null, "kind": "string filter" }
+  ]
+}

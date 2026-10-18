@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "bar_chart",
+      "title": "Queue depth by stage",
+      "unit": "jobs",
+      "items": [
+        {
+          "label": "stage 01",
+          "value": 1
+        },
+        {
+          "label": "stage 02",
+          "value": 2
+        },
+        {
+          "label": "stage 03",
+          "value": 3
+        },
+        {
+          "label": "stage 04",
+          "value": 4
+        },
+        {
+          "label": "stage 05",
+          "value": 5
+        },
+        {
+          "label": "stage 06",
+          "value": 6
+        },
+        {
+          "label": "stage 07",
+          "value": 7
+        },
+        {
+          "label": "stage 08",
+          "value": 8
+        },
+        {
+          "label": "stage 09",
+          "value": 9
+        },
+        {
+          "label": "stage 10",
+          "value": 10
+        },
+        {
+          "label": "stage 11",
+          "value": 11
+        },
+        {
+          "label": "stage 12",
+          "value": 12
+        }
+      ]
+    }
+  ]
+}

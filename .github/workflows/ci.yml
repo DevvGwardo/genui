@@ -1,0 +1,42 @@
+# genui — continuous integration.
+#
+# Every step is a zero-dependency command that also runs on this workstation;
+# see LOOPS.md row D4 for the local green/red rehearsal behind each one.
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Contract checkers (bounds, errors, terminology)
+        run: |
+          node tools/check-bounds.mjs
+          node tools/check-errors.mjs
+          node tools/check-terms.mjs
+
+      - name: Lint SKILL.md frontmatter
+        run: node tools/check-skill-frontmatter.mjs
+
+      - name: Check relative links and anchors
+        run: node tools/check-links.mjs
+
+      - name: Enforce docs/ image budget
+        run: node tools/check-docs-budget.mjs
+
+      - name: Run the examples suite (valid, invalid, boundary)
+        run: python3 tools/check-examples.py
