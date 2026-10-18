@@ -25,7 +25,7 @@
       }
     }
   },
-  "$comment": "Rules the runtime enforces that JSON Schema cannot express: (1) total payload must not exceed 16,384 UTF-8 bytes (error code too_large); (2) every table row length must equal the columns length; (3) checklist item ids must be unique within a component. tools/validate.py mirrors all three.",
+  "$comment": "Rules the runtime enforces that JSON Schema cannot express: (1) total payload must not exceed 16,384 UTF-8 bytes (error code too_large); (2) every table row length must equal the columns length; (3) checklist item ids must be unique within a component; (4) the astral-plane format characters listed in $defs/plainText are rejected by the text filter (portable ECMA-262 patterns cannot match them). tools/validate.py mirrors all four.",
   "$defs": {
     "plainText": {
       "type": "string",

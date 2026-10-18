@@ -31,6 +31,9 @@ const NON_ERROR_TOKENS = new Set([
   "node_modules",
   // stdlib JSON keyword used by tools/validate.py for exact byte sizing
   "ensure_ascii",
+  // internal function names in tools/validate.py (the astral-plane text filter)
+  "astral_offender",
+  "scan_astral",
   // GitHub Actions event keyword used by .github/workflows/ci.yml
   "pull_request",
 ]);

@@ -7,6 +7,7 @@
     { "file": "too-large-payload.json", "expectedCode": "too_large", "kind": "over byte cap" },
     { "file": "bound-violation.json", "expectedCode": null, "kind": "bound violation" },
     { "file": "unknown-version.json", "expectedCode": null, "kind": "unknown version" },
-    { "file": "duplicate-checklist-id.json", "expectedCode": null, "kind": "duplicate id" }
+    { "file": "duplicate-checklist-id.json", "expectedCode": null, "kind": "duplicate id" },
+    { "file": "astral-format-char.json", "expectedCode": null, "kind": "string filter" }
   ]
 }

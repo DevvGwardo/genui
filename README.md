@@ -47,7 +47,7 @@ Rendered blocks are labeled by Hermes Desk as **Generated UI · Agent-provided d
 From a user prompt to sandboxed native desktop UI, in four steps:
 
 1. **Discovery:** The agent locates the deferred tool using `tool_search` and `tool_describe`, so the schema stays out of the context window by default.
-2. **Validation:** Payload is checked against the strict v1 schema, size limits (&le; 16 KB), and string sanitization rules — no HTML tags or URLs allowed.
+2. **Validation:** Payload is checked against the strict v1 schema, size limits (&le; 16,384 bytes), and string sanitization rules — no HTML tags or URLs allowed.
 3. **Dispatch:** Hermes Desk executes the tool and mints a server-side `genuiOccurrence` token, preventing state spoofing.
 4. **Rendering:** Native, accessible DOM cards render directly into the conversation stream; checklist state is stored locally as user-local notes.
 

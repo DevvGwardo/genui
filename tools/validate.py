@@ -2,9 +2,10 @@
 """genui v1 payload validator (zero dependencies, Python 3 standard library only).
 
 Validates a render_ui argument exactly against schema/v1.json: the JSON Schema
-subset that file uses, the four widget types, and the three runtime-only rules
-recorded in the schema $comment - the 16,384-byte cap, table row lengths equal
-to the column count, and unique checklist ids within a component.
+subset that file uses, the four widget types, and the runtime-only rules
+recorded in the schema $comment - the astral-plane format characters that JSON
+Schema cannot express portably, the 16,384-byte cap, table row lengths equal to
+the column count, and unique checklist ids within a component.
 
 Usage:
     python3 tools/validate.py FILE [FILE ...]
@@ -26,6 +27,21 @@ from pathlib import Path
 SCHEMA = Path(__file__).resolve().parent.parent / "schema" / "v1.json"
 CAP = 16384  # the byte cap from docs/contract.md; the schema $comment notes it too
 CACHE = {}
+
+# Astral-plane (above U+FFFF) format characters, rejected by the runtime text
+# filter and by this validator. The schema's BMP character class cannot express
+# them and ECMA-262 patterns without the u flag cannot match them portably, so
+# schema/v1.json lists the ranges in a $comment and they are enforced here.
+# Every range below is Unicode general category Cf (format) except where noted.
+ASTRAL_FORMAT_RANGES = (
+    (0x110BD, 0x110BD),  # KAITHI NUMBER SIGN
+    (0x110CD, 0x110CD),  # KAITHI NUMBER SIGN ABOVE
+    (0x13430, 0x1343F),  # EGYPTIAN HIEROGLYPH format controls
+    (0x1BCA0, 0x1BCA3),  # SHORTHAND FORMAT controls
+    (0x1D173, 0x1D17A),  # MUSICAL SYMBOL format controls
+    (0xE0001, 0xE0001),  # LANGUAGE TAG
+    (0xE0020, 0xE007F),  # TAG characters (U+E0020-U+E007E tags, U+E007F cancel)
+)
 
 with open(SCHEMA, encoding="utf-8") as fh:
     ROOT = json.loads(fh.read())
@@ -179,6 +195,32 @@ def verdict(rec):
     return table.get(kw, (None, "unclassified keyword " + kw))
 
 
+def astral_offender(text):
+    """Return the first astral-plane format character in text, or None."""
+    for ch in text:
+        cp = ord(ch)
+        if cp < 0x10000:
+            continue
+        for lo, hi in ASTRAL_FORMAT_RANGES:
+            if lo <= cp <= hi:
+                return cp
+    return None
+
+
+def scan_astral(value, pointer, out):
+    """Collect astral-plane format-character violations with JSON pointers."""
+    if isinstance(value, str):
+        cp = astral_offender(value)
+        if cp is not None:
+            add(out, pointer, "not", "astral format character U+%04X" % cp)
+    elif isinstance(value, dict):
+        for name, sub in value.items():
+            scan_astral(sub, pointer + "/" + name, out)
+    elif isinstance(value, list):
+        for i, item in enumerate(value):
+            scan_astral(item, pointer + "/" + str(i), out)
+
+
 def check(payload):
     out = []
     run(payload, ROOT, ROOT, "", out)
@@ -186,6 +228,17 @@ def check(payload):
         rec = out[0]
         code, reason = verdict(rec)
         return {"ok": False, "code": code, "reason": reason, "pointer": rec["pointer"]}
+    astral = []
+    scan_astral(payload, "", astral)
+    if astral:
+        # Same rejection class as the schema's BMP filter: documented in
+        # docs/contract.md, no code named in v1 docs, so code=none.
+        return {
+            "ok": False,
+            "code": None,
+            "reason": "string filter",
+            "pointer": astral[0]["pointer"],
+        }
     size = len(json.dumps(payload, separators=(",", ":"), ensure_ascii=False).encode("utf-8"))
     if size > CAP:
         return {"ok": False, "code": "too_large", "reason": "over byte cap", "pointer": ""}

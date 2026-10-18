@@ -7,7 +7,7 @@
 // The budget is deliberately explicit (row D4, tightened by E1): on 2026-10-17
 // the five docs/ PNG originals (3,120,794 bytes) were converted to WebP at
 // quality 92 with original dimensions preserved (589,618 bytes; measured mean
-// deviation under 0.7/255 per image), taking docs/ to 602,349 bytes total.
+// deviation under 0.7/255 per image), taking docs/ to 602,351 bytes total.
 // The budget is 650,000 bytes — about 10% of headroom over the measured WebP
 // total, enough for an ordinary re-save, tight enough that any new full-size
 // asset fails. This number must never be raised without a recorded

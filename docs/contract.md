@@ -2,7 +2,7 @@
 
 Single source of truth for every numeric and character bound of the `mcp__hermes_desk__render_ui` v1 payload. The runtime behavior of Hermes Desk is the product contract; `schema/v1.json`, `skills/genui/SKILL.md` and `README.md` are consumers of this table. If any artifact disagrees with this table, the artifact is the bug — fix it in the same change, never "update the table to match the bug".
 
-Consistency check: `node tools/check-bounds.mjs` extracts the bound tokens below and diffs them against `skills/genui/SKILL.md`, exiting non-zero on any drift (counts matter, so a bound cannot be moved between fields undetected).
+Consistency check: `node tools/check-bounds.mjs` extracts the bound tokens below and diffs them against `skills/genui/SKILL.md` (as a multiset, so counts matter), then diffs the same vocabulary against `schema/v1.json` (as a set), exiting non-zero on any drift.
 
 ## Bounds
 
@@ -61,4 +61,4 @@ All strings must pass the runtime text filter. A string is rejected when it cont
 
 ## Keeping this table honest
 
-Run `node tools/check-bounds.mjs` before committing any change to a bound. The checker covers this table and `skills/genui/SKILL.md`; `README.md` and `schema/v1.json` must be updated in the same commit by hand. Bounds stated only inside fenced code blocks are ignored by the checker — always state bounds in the table above.
+Run `node tools/check-bounds.mjs` before committing any change to a bound. The checker covers this table, `skills/genui/SKILL.md` (multiset diff) and `schema/v1.json` (set diff, with the byte cap and the per-turn call cap excluded as runtime rules rather than payload content); `README.md` must be updated in the same commit by hand. Bounds stated only inside fenced code blocks are ignored by the checker — always state bounds in the table above.
