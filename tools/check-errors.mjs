@@ -31,6 +31,8 @@ const NON_ERROR_TOKENS = new Set([
   "node_modules",
   // stdlib JSON keyword used by tools/validate.py for exact byte sizing
   "ensure_ascii",
+  // GitHub Actions event keyword used by .github/workflows/ci.yml
+  "pull_request",
 ]);
 
 const MIN_DECLARED = 4; // sanity floor: the four canonical codes
