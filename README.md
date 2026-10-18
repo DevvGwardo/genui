@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/repo-banner.png" alt="genui skill banner" width="100%">
+  <img src="docs/repo-banner.webp" alt="genui skill banner" width="100%">
 </p>
 
 # genui
@@ -40,7 +40,7 @@ Rendered blocks are labeled by Hermes Desk as **Generated UI · Agent-provided d
 ## How it works
 
 <p align="center">
-  <img src="docs/how-it-works.png" alt="How genui works pipeline" width="100%">
+  <img src="docs/how-it-works.webp" alt="How genui works pipeline" width="100%">
 </p>
 
 From a user prompt to sandboxed native desktop UI, in four steps:
@@ -138,13 +138,13 @@ The skill enforces a strict v1 schema contract, hard caps (1–4 components per 
 ## Example
 
 <p align="center">
-  <img src="docs/example.png" alt="genui payload to rendered UI example" width="100%">
+  <img src="docs/example.webp" alt="genui payload to rendered UI example" width="100%">
 </p>
 
 ## Why "data-only"?
 
 <p align="center">
-  <img src="docs/why-to-use-it.png" alt="Why use genui bounded cards" width="100%">
+  <img src="docs/why-to-use-it.webp" alt="Why use genui bounded cards" width="100%">
 </p>
 
 *Design illustration. Measured equivalent: ≈73–78% fewer emitted bytes than equivalent styled HTML artifacts for the same content — see [`docs/context-reduction.md`](docs/context-reduction.md).*

@@ -1,7 +1,7 @@
 # Context reduction measurement
 
 This is the repository's committed measurement of record for the "token reduction"
-claim that appears in [`why-to-use-it.png`](why-to-use-it.png) (tracked as LOOP C5 in
+claim that appears in [`why-to-use-it.webp`](why-to-use-it.webp) (tracked as LOOP C5 in
 `LOOPS.md`).
 
 ## What is measured
