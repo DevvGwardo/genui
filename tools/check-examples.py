@@ -13,6 +13,12 @@ Runs tools/validate.py (the validator of record) over the committed examples:
                              rejection class must equal the manifest's `kind`.
                              The file set is asserted in both directions, so a
                              fixture cannot be added or dropped silently.
+    examples/boundary/*.json every fixture in examples/boundary/manifest.json
+                             must hit its declared outcome - valid, or the
+                             declared code + reason - and when the case
+                             declares `bytes`, the payload's exact compact
+                             UTF-8 size is asserted (the 16,384-byte cap is
+                             inclusive; 16,385 must fail with too_large).
 
 Usage:  python3 tools/check-examples.py
 Exit status: 0 when the whole suite matches, 1 otherwise.
@@ -47,6 +53,12 @@ def parse(path, line):
     if m.group(2) == "valid":
         return {"ok": True}
     return {"ok": False, "code": m.group(3), "reason": m.group(4)}
+
+
+def compact(path):
+    with open(path, "rb") as fh:
+        payload = json.loads(fh.read())
+    return len(json.dumps(payload, separators=(",", ":"), ensure_ascii=False).encode("utf-8"))
 
 
 def main():
@@ -103,8 +115,59 @@ def main():
             continue
         print(f"  {name}: rejected code={rec['code']} reason={rec['reason']} (expected {want}/{case['kind']})")
 
+    boundary = ROOT / "examples" / "boundary"
+    if not boundary.is_dir():
+        bad += 1
+        print("FAIL: examples/boundary is missing")
+    else:
+        with open(boundary / "manifest.json", encoding="utf-8") as fh:
+            suite = json.load(fh)
+        cases = suite["cases"]
+        local = sorted(p.name for p in boundary.glob("*.json") if p.name != "manifest.json")
+        referenced = sorted(Path(case["file"]).name for case in cases if not case["file"].startswith("../"))
+        if local != referenced:
+            bad += 1
+            print("FAIL: examples/boundary file set differs from its manifest:")
+            print(f"  on disk: {local}")
+            print(f"  referenced: {referenced}")
+        print(f"examples/boundary: {len(cases)} fixture(s), each must hit exactly its declared boundary outcome")
+        for case in cases:
+            path = (boundary / case["file"]).resolve()
+            rc, line = run(path)
+            rec = parse(path, line)
+            fail = 0
+            if case["expect"] == "valid":
+                if rc == 0 and rec and rec["ok"]:
+                    detail = f"valid - {case['label']}"
+                else:
+                    fail += 1
+                    detail = f"expected valid, got rc={rc} line={line!r}"
+            else:
+                want = case.get("code", "none")
+                if rc != 1 or not rec or rec["ok"]:
+                    fail += 1
+                    detail = f"expected rejection, got rc={rc} line={line!r}"
+                elif rec["code"] != want or rec["reason"] != case.get("reason"):
+                    fail += 1
+                    detail = (f"expected code={want} reason={case.get('reason')!r}, "
+                              f"got code={rec['code']} reason={rec['reason']!r}")
+                else:
+                    detail = f"rejected code={rec['code']} reason={rec['reason']} - {case['label']}"
+            if "bytes" in case:
+                got = compact(path)
+                if got != case["bytes"]:
+                    fail += 1
+                    detail += f" | compact size {got} != declared {case['bytes']}"
+                else:
+                    detail += f" | compact size {got} as declared"
+            if fail:
+                bad += fail
+                print(f"  FAIL: {case['file']}: {detail}")
+            else:
+                print(f"  {case['file']}: {detail}")
+
     if bad == 0:
-        print("PASS: examples suite matches - valid set validates, invalid set rejects exactly as declared.")
+        print("PASS: examples suites match - valid set validates, invalid set rejects exactly as declared, boundary set hits its declared outcomes.")
         return 0
     print(f"FAIL: {bad} example problem(s).")
     return 1

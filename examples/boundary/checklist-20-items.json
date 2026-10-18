@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "checklist",
+      "title": "Release runbook (20 steps)",
+      "items": [
+        {
+          "id": "step-01",
+          "label": "Step 01: release task",
+          "checked": false
+        },
+        {
+          "id": "step-02",
+          "label": "Step 02: release task",
+          "checked": true
+        },
+        {
+          "id": "step-03",
+          "label": "Step 03: release task",
+          "checked": false
+        },
+        {
+          "id": "step-04",
+          "label": "Step 04: release task",
+          "checked": true
+        },
+        {
+          "id": "step-05",
+          "label": "Step 05: release task",
+          "checked": false
+        },
+        {
+          "id": "step-06",
+          "label": "Step 06: release task",
+          "checked": true
+        },
+        {
+          "id": "step-07",
+          "label": "Step 07: release task",
+          "checked": false
+        },
+        {
+          "id": "step-08",
+          "label": "Step 08: release task",
+          "checked": true
+        },
+        {
+          "id": "step-09",
+          "label": "Step 09: release task",
+          "checked": false
+        },
+        {
+          "id": "step-10",
+          "label": "Step 10: release task",
+          "checked": true
+        },
+        {
+          "id": "step-11",
+          "label": "Step 11: release task",
+          "checked": false
+        },
+        {
+          "id": "step-12",
+          "label": "Step 12: release task",
+          "checked": true
+        },
+        {
+          "id": "step-13",
+          "label": "Step 13: release task",
+          "checked": false
+        },
+        {
+          "id": "step-14",
+          "label": "Step 14: release task",
+          "checked": true
+        },
+        {
+          "id": "step-15",
+          "label": "Step 15: release task",
+          "checked": false
+        },
+        {
+          "id": "step-16",
+          "label": "Step 16: release task",
+          "checked": true
+        },
+        {
+          "id": "step-17",
+          "label": "Step 17: release task",
+          "checked": false
+        },
+        {
+          "id": "step-18",
+          "label": "Step 18: release task",
+          "checked": true
+        },
+        {
+          "id": "step-19",
+          "label": "Step 19: release task",
+          "checked": false
+        },
+        {
+          "id": "step-20",
+          "label": "Step 20: release task",
+          "checked": true
+        }
+      ]
+    }
+  ]
+}

@@ -38,5 +38,5 @@ jobs:
       - name: Enforce docs/ image budget
         run: node tools/check-docs-budget.mjs
 
-      - name: Run the examples suite (tools/validate.py)
+      - name: Run the examples suite (valid, invalid, boundary)
         run: python3 tools/check-examples.py
