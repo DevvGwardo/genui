@@ -11,7 +11,7 @@
   <a href="https://github.com/DevvGwardo/genui/commits/main"><img src="https://img.shields.io/github/last-commit/DevvGwardo/genui" alt="Last commit"></a>
 </p>
 
-A [Hermes Agent](https://github.com/NousResearch/hermes-agent) skill for rendering bounded, data-only Generated UI cards — stat cards, tables, bar charts, and checklists — natively inside Hermes Desk conversations via the `mcp__hermes_desk__render_ui` MCP tool.
+A [Hermes Agent](https://github.com/NousResearch/hermes-agent) skill for rendering bounded, data-only Generated UI cards — stat cards, tables, bar charts, and checklists — natively inside [Hermes Desk](https://github.com/DevvGwardo/hermes-desk) conversations via the `mcp__hermes_desk__render_ui` MCP tool.
 
 No HTML. No `::preview` iframes. Just native, accessible data widgets that render straight into the chat surface.
 
@@ -124,6 +124,7 @@ Once installed, trigger it naturally:
 - *"render a checklist for …"*
 
 The skill enforces a strict v1 schema contract, hard caps (1–4 components per call, ≤ 4 calls per turn, ≤ 16,384 bytes), and a string validator that rejects markup, URLs, and control characters — so agents can't smuggle HTML or links into the rendered surface.
+
 
 ## Troubleshooting
 
