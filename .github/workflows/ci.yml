@@ -40,3 +40,6 @@ jobs:
 
       - name: Run the examples suite (valid, invalid, boundary)
         run: python3 tools/check-examples.py
+
+      - name: Validate payloads embedded in README and SKILL.md
+        run: python3 tools/check-doc-payloads.py

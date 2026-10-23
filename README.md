@@ -126,6 +126,22 @@ Once installed, trigger it naturally:
 The skill enforces a strict v1 schema contract, hard caps (1–4 components per call, ≤ 4 calls per turn, ≤ 16,384 bytes), and a string validator that rejects markup, URLs, and control characters — so agents can't smuggle HTML or links into the rendered surface.
 
 
+A complete `render_ui` argument looks like this. It is checked against [`schema/v1.json`](schema/v1.json) on every push — `tools/check-doc-payloads.py` validates each payload embedded in this README and in `SKILL.md`, so the examples below cannot drift from the contract:
+
+```json
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "stat",
+      "title": "Sprint velocity",
+      "value": "42 pts",
+      "detail": "median of the last 3 sprints"
+    }
+  ]
+}
+```
+
 ## Troubleshooting
 
 | Symptom | Likely cause | Fix |
