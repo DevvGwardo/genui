@@ -1,0 +1,34 @@
+name: Feature request
+description: Propose a change to the skill, the contract, or the checks.
+title: "[feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Contract changes (a new widget type, a changed bound, a changed error code)
+        are proposed under "Proposed contract changes" in LOOPS.md before they land.
+        Please say whether this request is one of those.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What can you not do today, and who hits it?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: The smallest change that solves it.
+    validations:
+      required: true
+  - type: checkboxes
+    id: contract
+    attributes:
+      label: Contract impact
+      options:
+        - label: This changes a bound, a widget type, or an error code
+          required: false
+        - label: This can be done without a contract change
+          required: false

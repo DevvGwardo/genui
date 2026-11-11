@@ -25,6 +25,7 @@ No HTML. No `::preview` iframes. Just native, accessible data widgets that rende
 - [Troubleshooting](#troubleshooting)
 - [Example](#example)
 - [Why "data-only"?](#why-data-only)
+- [Security](#security)
 - [License](#license)
 
 ## What it renders
@@ -177,6 +178,14 @@ The comparison behind the data-only design — arbitrary HTML/iframe rendering v
 | **No native state or accessibility** — buttons and toggles break or need costly model round-trips for trivial interactions. | **Zero-token user-local checklists** — checkbox state persists in local client storage; toggling never calls back to the agent. |
 
 Hermes Desk renders these widgets in a sandboxed native surface, and the skill documents the exact constraints — no angle brackets, no URI schemes, no `genuiOccurrence` spoofing — so any agent using it stays inside the trust boundary.
+
+## Security
+
+The security boundary of this project is the v1 payload contract: the text filter, the
+byte cap, the runtime table/checklist rules, and the server-minted `genuiOccurrence`.
+If a payload passes `tools/validate.py` but still renders content outside that boundary,
+report it privately — see [`SECURITY.md`](SECURITY.md) for scope and the reporting
+process. Please do not open a public issue for a filter bypass.
 
 ## License
 
