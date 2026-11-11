@@ -2,6 +2,9 @@
 #
 # Every step is a zero-dependency command that also runs on this workstation;
 # see LOOPS.md row D4 for the local green/red rehearsal behind each one.
+#
+# Actions are pinned to a commit SHA and kept current by Dependabot
+# (.github/dependabot.yml). Superseded runs on the same ref are cancelled.
 name: ci
 
 on:
@@ -11,15 +14,20 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   checks:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Set up Node 20
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "20"
 
@@ -40,3 +48,6 @@ jobs:
 
       - name: Run the examples suite (valid, invalid, boundary)
         run: python3 tools/check-examples.py
+
+      - name: Validate payloads embedded in README and SKILL.md
+        run: python3 tools/check-doc-payloads.py

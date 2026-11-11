@@ -29,6 +29,7 @@ node tools/check-skill-frontmatter.mjs
 node tools/check-links.mjs
 node tools/check-docs-budget.mjs
 python3 tools/check-examples.py
+python3 tools/check-doc-payloads.py
 ```
 
 CI (`.github/workflows/ci.yml`) runs these on every push and pull request — the

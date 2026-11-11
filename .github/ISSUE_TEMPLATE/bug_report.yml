@@ -1,0 +1,45 @@
+name: Bug report
+description: Something in the skill text, the contract, or a checker is wrong.
+title: "[bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not paste real user data, credentials, or live card contents.
+        For a text-filter or contract bypass, use the private process in
+        SECURITY.md instead of this form.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you ran, what you expected, and what you saw.
+    validations:
+      required: true
+  - type: textarea
+    id: payload
+    attributes:
+      label: Minimal payload or command
+      description: The smallest input that reproduces the problem.
+      render: json
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: Commit or tag
+      description: The tag or commit you tested.
+    validations:
+      required: false
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where it shows up
+      options:
+        - Skill text (skills/genui/SKILL.md)
+        - Contract or schema
+        - A checker under tools/
+        - Examples
+        - Documentation
+    validations:
+      required: true
