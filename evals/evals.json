@@ -1,0 +1,270 @@
+{
+  "skillName": "genui",
+  "version": 1,
+  "evals": [
+    {
+      "id": "stat-build-time",
+      "category": "widget",
+      "prompt": "Use genui to render a stat card showing today's build time of 3m 42s (p50 over the last 20 runs).",
+      "shouldTriggerRenderUi": true,
+      "expectedPayload": {
+        "version": 1,
+        "components": [
+          {
+            "type": "stat",
+            "title": "Build time",
+            "value": "3m 42s",
+            "detail": "p50 over the last 20 runs"
+          }
+        ]
+      },
+      "assertions": {
+        "stage1Valid": true,
+        "componentTypes": ["stat"],
+        "maxComponents": 1,
+        "maxBytes": 16384,
+        "mustContainText": ["Build time", "3m 42s", "p50 over the last 20 runs"],
+        "mustNotContainHtml": true
+      }
+    },
+    {
+      "id": "table-queue-bursts",
+      "category": "widget",
+      "prompt": "Render a table of the queue bursts across api, worker, and scheduler with state and depth.",
+      "shouldTriggerRenderUi": true,
+      "expectedPayload": {
+        "version": 1,
+        "components": [
+          {
+            "type": "table",
+            "title": "Queue bursts",
+            "columns": ["Service", "State", "Depth"],
+            "rows": [
+              ["api", "ok", 4],
+              ["worker", "degraded", 19],
+              ["scheduler", "ok", 2]
+            ]
+          }
+        ]
+      },
+      "assertions": {
+        "stage1Valid": true,
+        "componentTypes": ["table"],
+        "maxComponents": 1,
+        "maxBytes": 16384,
+        "mustContainText": ["Queue bursts", "worker", "degraded"],
+        "mustNotContainHtml": true
+      }
+    },
+    {
+      "id": "bar-chart-throughput",
+      "category": "widget",
+      "prompt": "Render a bar chart of job queue depth by stage measured in jobs: queued 12, running 3, failed 1.",
+      "shouldTriggerRenderUi": true,
+      "expectedPayload": {
+        "version": 1,
+        "components": [
+          {
+            "type": "bar_chart",
+            "title": "Queue depth by stage",
+            "unit": "jobs",
+            "items": [
+              { "label": "queued", "value": 12 },
+              { "label": "running", "value": 3 },
+              { "label": "failed", "value": 1 }
+            ]
+          }
+        ]
+      },
+      "assertions": {
+        "stage1Valid": true,
+        "componentTypes": ["bar_chart"],
+        "maxComponents": 1,
+        "maxBytes": 16384,
+        "mustContainText": ["Queue depth by stage", "jobs", "queued"],
+        "mustNotContainHtml": true
+      }
+    },
+    {
+      "id": "checklist-release-steps",
+      "category": "widget",
+      "prompt": "Render a checklist for the release steps: verify profile scope (done), run focused checks (pending), tag release (pending).",
+      "shouldTriggerRenderUi": true,
+      "expectedPayload": {
+        "version": 1,
+        "components": [
+          {
+            "type": "checklist",
+            "title": "Release steps",
+            "items": [
+              { "id": "verify-scope", "label": "Verify profile scope", "checked": true },
+              { "id": "run-checks", "label": "Run focused checks", "checked": false },
+              { "id": "tag-release", "label": "Tag release", "checked": false }
+            ]
+          }
+        ]
+      },
+      "assertions": {
+        "stage1Valid": true,
+        "componentTypes": ["checklist"],
+        "maxComponents": 1,
+        "maxBytes": 16384,
+        "mustContainText": ["Release steps", "Verify profile scope", "Tag release"],
+        "mustNotContainHtml": true
+      }
+    },
+    {
+      "id": "four-up-release-overview",
+      "category": "layout",
+      "prompt": "Use genui to render a four-up card summarizing active tasks, queue summary, throughput, and next steps.",
+      "shouldTriggerRenderUi": true,
+      "expectedPayload": {
+        "version": 1,
+        "components": [
+          {
+            "type": "stat",
+            "title": "Active tasks",
+            "value": "12",
+            "detail": "4 due today"
+          },
+          {
+            "type": "table",
+            "title": "Queue summary",
+            "columns": ["Stage", "Count"],
+            "rows": [
+              ["Review", 3],
+              ["Ready", 9]
+            ]
+          },
+          {
+            "type": "bar_chart",
+            "title": "Throughput",
+            "unit": "items",
+            "items": [
+              { "label": "Review", "value": 3 },
+              { "label": "Ready", "value": 9 }
+            ]
+          },
+          {
+            "type": "checklist",
+            "title": "Next steps",
+            "items": [
+              { "id": "verify-scope", "label": "Verify profile scope", "checked": true },
+              { "id": "run-checks", "label": "Run focused checks", "checked": false }
+            ]
+          }
+        ]
+      },
+      "assertions": {
+        "stage1Valid": true,
+        "componentTypes": ["stat", "table", "bar_chart", "checklist"],
+        "maxComponents": 4,
+        "maxBytes": 16384,
+        "mustContainText": ["Active tasks", "Queue summary", "Throughput", "Next steps"],
+        "mustNotContainHtml": true
+      }
+    },
+    {
+      "id": "pruning-byte-cap",
+      "category": "pruning",
+      "prompt": "Render a dashboard card whose initial draft exceeds 16,384 bytes; apply deterministic byte-cap pruning by dropping optional fields (detail, unit, checked) and trailing rows until it fits.",
+      "shouldTriggerRenderUi": true,
+      "expectedPayload": {
+        "version": 1,
+        "components": [
+          {
+            "type": "stat",
+            "title": "P95 latency",
+            "value": "412 ms"
+          },
+          {
+            "type": "table",
+            "title": "Top degraded services",
+            "columns": ["Service", "Region", "Errors"],
+            "rows": [
+              ["api", "us-east", 142],
+              ["worker", "eu-west", 87]
+            ]
+          },
+          {
+            "type": "bar_chart",
+            "title": "Errors by tier",
+            "items": [
+              { "label": "api", "value": 142 },
+              { "label": "worker", "value": 87 }
+            ]
+          },
+          {
+            "type": "checklist",
+            "title": "Mitigation",
+            "items": [
+              { "id": "drain-queue", "label": "Drain backlog on eu-west worker" },
+              { "id": "check-health", "label": "Confirm p95 returns below 250 ms" }
+            ]
+          }
+        ]
+      },
+      "assertions": {
+        "stage1Valid": true,
+        "componentTypes": ["stat", "table", "bar_chart", "checklist"],
+        "maxComponents": 4,
+        "maxBytes": 16384,
+        "droppedOptionalFields": ["detail", "unit", "checked"],
+        "mustContainText": ["P95 latency", "412 ms", "Top degraded services", "Mitigation"],
+        "mustNotContainHtml": true
+      }
+    },
+    {
+      "id": "negative-markup-and-links",
+      "category": "negative",
+      "prompt": "Render a genui table card with clickable https://example.com PR links and <code>status</code> HTML badges inside the table cells.",
+      "shouldTriggerRenderUi": false,
+      "expectedPayload": null,
+      "assertions": {
+        "stage1Valid": false,
+        "reasonCategory": "markup-or-links",
+        "expectedBehavior": "Do not call render_ui because card strings forbid HTML markup and URI schemes; render links and formatting in Markdown prose instead.",
+        "mustNotContainHtml": true
+      }
+    },
+    {
+      "id": "negative-exceeds-limits",
+      "category": "negative",
+      "prompt": "Use genui to display the full 40-row, 7-column incident audit matrix without summarizing or aggregating any rows.",
+      "shouldTriggerRenderUi": false,
+      "expectedPayload": null,
+      "assertions": {
+        "stage1Valid": false,
+        "reasonCategory": "exceeds-limits",
+        "expectedBehavior": "Do not emit an oversized or invalid table payload; present the full 40-row, 7-column matrix in Markdown prose or ask to summarize.",
+        "mustNotContainHtml": true
+      }
+    },
+    {
+      "id": "negative-interactive-callback",
+      "category": "negative",
+      "prompt": "Render a genui form with an approval button that calls you back to trigger the production deployment when clicked.",
+      "shouldTriggerRenderUi": false,
+      "expectedPayload": null,
+      "assertions": {
+        "stage1Valid": false,
+        "reasonCategory": "interactive-callback",
+        "expectedBehavior": "Do not fake a callback button or form; explain in prose that only user-local checklist toggles exist and they never call back.",
+        "mustNotContainHtml": true
+      }
+    },
+    {
+      "id": "negative-tool-unavailable",
+      "category": "negative",
+      "prompt": "Render a stat card via genui even though render_ui just returned not_enabled for this profile.",
+      "shouldTriggerRenderUi": false,
+      "expectedPayload": null,
+      "assertions": {
+        "stage1Valid": false,
+        "reasonCategory": "tool-unavailable",
+        "expectedBehavior": "Do not retry in a loop and never emit preview HTML; explain how to enable Agent browsing in Settings and restart the Hermes session.",
+        "mustNotContainHtml": true
+      }
+    }
+  ]
+}

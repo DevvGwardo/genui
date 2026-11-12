@@ -6,6 +6,20 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)-style sections,
 
 ## Unreleased
 
+## [1.1.0] - 2026-11-12
+
+- test(G1): add `tools/fuzz-validator.mjs` — zero-dependency Node reference validator and deterministic seeded PRNG generator testing 5,576 payloads against `tools/validate.py` with 0 verdict divergences; wired into CI.
+- docs(G2): add `docs/security.md` documenting the text-filter threat model, homoglyph/normalization boundaries, astral-plane `Cf` exclusions, parser hardening limits, and server-minted `genuiOccurrence` trust boundary, backed by 7 new adversarial fixtures in `examples/invalid/` (15 total).
+- ci(G3): add `tools/package-skill.py` (deterministic `genui-skill.zip` + `.sha256` packager for `skills/genui/` only) and `.github/workflows/release.yml` (verifies `v*` tag matches `skills/genui/SKILL.md` version, runs full CI suite, and attaches release artifacts).
+- ci(G4): add `--external` mode to `tools/check-links.mjs` (Node 20 `fetch` HEAD→GET check) and `.github/workflows/links-external.yml` (weekly + manual dispatch).
+- docs(G5): add `## Deterministic Repair Loop` to `skills/genui/SKILL.md` mapping `bad_args` and validation rejections 1-to-1 to Pre-flight Self-check lines with an explicit at-most-1-retry cap.
+- feat(I1): shorten `skills/genui/SKILL.md` frontmatter `description` to 44 chars (`<=60`, matching Hermes Agent prompt index limit), declare `platforms: [macos, linux, windows]`, bump `version: 1.1.0`, and extend `tools/check-skill-frontmatter.mjs` with authoring and static security-guard checks.
+- fix(I2): harden `tools/validate.py` against unhashable `type`, `NaN`/`Infinity` JSON constants, lone surrogates, unescaped `~`/`/` JSON Pointers, trailing-newline regex matches, and deep nesting (`>32`), and add `--json`/`--jsonl` structured diagnostics.
+- test(I3): add `evals/evals.json` (10 golden positive and negative evals) and `tools/check-evals.mjs` (Stage-1 validation + Stage-2 deterministic assertions) wired into CI.
+- docs(I4): add `upstream/sources.json`, `docs/upstream-sources.md`, `tools/check-upstream.mjs`, `.github/workflows/upstream-watch.yml`, and bloat-gate intake checklists in `CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md` for auditable upstream inheritance.
+
+## [1.0.0] - 2026-10-23
+
 - docs: add `LOOPS.md`, the 30-loop improvement queue (LOOP 0 scaffolding), plus `CHANGELOG.md`.
 - feat(A1): add `schema/v1.json` — exact JSON Schema 2020-12 mirror of the v1 `render_ui` payload contract (4 widget types, every documented bound, `additionalProperties: false`); runtime-only rules that JSON Schema cannot express (16,384-byte cap, table row length, checklist id uniqueness) are called out in `$comment`s. Verified against ajv 8.17.1: 34/34 cases, accepts a 4-component payload, rejects an unknown key.
 - docs(A2): add `docs/contract.md` — single source of truth for every v1 bound — and `tools/check-bounds.mjs`, a zero-dependency plain-Node checker that multiset-diffs the table against `skills/genui/SKILL.md` (19/19 bound tokens match; a mutated bound makes it exit 1).

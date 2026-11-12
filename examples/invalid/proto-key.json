@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "stat",
+      "title": "Prototype key injection test",
+      "value": "ok",
+      "__proto__": { "polluted": true }
+    }
+  ]
+}

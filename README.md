@@ -26,6 +26,7 @@ No HTML. No `::preview` iframes. Just native, accessible data widgets that rende
 - [Example](#example)
 - [Why "data-only"?](#why-data-only)
 - [Security](#security)
+- [Upstream sources](#upstream-sources)
 - [License](#license)
 
 ## What it renders
@@ -183,9 +184,18 @@ Hermes Desk renders these widgets in a sandboxed native surface, and the skill d
 
 The security boundary of this project is the v1 payload contract: the text filter, the
 byte cap, the runtime table/checklist rules, and the server-minted `genuiOccurrence`.
+For the full text-filter and parser threat model backed by executable adversarial
+fixtures, see [`docs/security.md`](docs/security.md).
 If a payload passes `tools/validate.py` but still renders content outside that boundary,
 report it privately — see [`SECURITY.md`](SECURITY.md) for scope and the reporting
 process. Please do not open a public issue for a filter bypass.
+
+## Upstream sources
+
+`genui` inherits vetted engineering patterns from public peer repositories under a
+4-point zero-bloat filter and pinned-SHA provenance ledger — see
+[`docs/upstream-sources.md`](docs/upstream-sources.md) and
+[`upstream/sources.json`](upstream/sources.json).
 
 ## License
 

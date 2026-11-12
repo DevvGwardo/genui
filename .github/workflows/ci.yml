@@ -1,7 +1,7 @@
 # genui — continuous integration.
 #
-# Every step is a zero-dependency command that also runs on this workstation;
-# see LOOPS.md row D4 for the local green/red rehearsal behind each one.
+# Every step is a zero-dependency command that also runs on local workstations;
+# see LOOPS.md for the local green/red rehearsal behind each one.
 #
 # Actions are pinned to a commit SHA and kept current by Dependabot
 # (.github/dependabot.yml). Superseded runs on the same ref are cancelled.
@@ -24,10 +24,10 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Node 20
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "20"
 
@@ -37,7 +37,7 @@ jobs:
           node tools/check-errors.mjs
           node tools/check-terms.mjs
 
-      - name: Lint SKILL.md frontmatter
+      - name: Lint SKILL.md frontmatter and security hygiene
         run: node tools/check-skill-frontmatter.mjs
 
       - name: Check relative links and anchors
@@ -51,3 +51,15 @@ jobs:
 
       - name: Validate payloads embedded in README and SKILL.md
         run: python3 tools/check-doc-payloads.py
+
+      - name: Run differential validator fuzzer
+        run: node tools/fuzz-validator.mjs
+
+      - name: Run deterministic skill eval suite
+        run: node tools/check-evals.mjs
+
+      - name: Check upstream provenance registry and ledger parity
+        run: node tools/check-upstream.mjs
+
+      - name: Build and verify reproducible skill archive
+        run: python3 tools/package-skill.py --verify

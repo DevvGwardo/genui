@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "stat",
+      "title": "ZWJ emoji sequence",
+      "value": "\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67"
+    }
+  ]
+}

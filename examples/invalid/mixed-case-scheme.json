@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "stat",
+      "title": "Mixed-case URI scheme",
+      "value": "JaVaScRiPt:alert(1)"
+    }
+  ]
+}

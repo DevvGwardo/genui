@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "type": ["stat"],
+      "title": "Unhashable component type",
+      "value": "1"
+    }
+  ]
+}

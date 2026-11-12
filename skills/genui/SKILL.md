@@ -1,9 +1,10 @@
 ---
 name: genui
-description: 'Use when asked to render bounded, data-only UI in Hermes Desk — the "genui" skill. Natural triggers: "genui", "render a table of ...", "render a stat card showing ...", "render a bar chart of ...", "render a checklist for ...". Renders stat, table, bar_chart and checklist widgets via the mcp__hermes_desk__render_ui MCP tool.'
-version: 1.0.0
+description: 'Render bounded data-only UI cards via genui.'
+version: 1.1.0
 author: devgwardo
 license: MIT
+platforms: [macos, linux, windows]
 metadata:
   hermes:
     tags: [ui, widgets, chart, table, checklist, desktop]
@@ -16,7 +17,7 @@ Use this skill to render native, accessible data cards directly inside a Hermes 
 
 ## When to Use
 
-- The user explicitly invokes **genui**, or asks to render a card: "render a table of the queue bursts", "render a stat card for today's build time", "render a checklist for the release steps".
+- The user explicitly invokes **genui**, or asks to render a card (natural triggers: `"render a table of ..."`, `"render a stat card showing ..."`, `"render a bar chart of ..."`, `"render a checklist for ..."`): e.g., queue bursts, today's build time, ranked throughput, or release steps.
 - The user wants a compact, scannable summary that fits the card limits: a handful of headline numbers, a small comparison matrix, a few ranked bars, a short runbook checklist.
 - The user wants a checklist they can tick off locally while reading; toggles are user-local notes and never call back to you.
 - Every value can be written as a short plain string or a finite number, and the whole argument fits the v1 payload contract in `docs/contract.md`.
@@ -234,6 +235,26 @@ Run this list against the exact JSON you are about to send. Each line names the 
 - [ ] Every table row has exactly as many cells as `columns` — rejected otherwise by: runtime rule (schema cannot express it; see `docs/contract.md`).
 - [ ] Checklist `id`s match the id pattern and are unique within their component — rejected otherwise by: `pattern` plus a runtime uniqueness rule (see `docs/errors.md`).
 - [ ] The serialized payload is within the byte cap — rejected otherwise by: runtime rule (`too_large`; see `docs/contract.md`).
+
+## Deterministic Repair Loop (`bad_args`)
+
+If `render_ui` returns `bad_args` (or pre-dispatch validation against `schema/v1.json` fails), apply this deterministic mapping **at most 1 retry** before reporting cleanly in prose — never retry in a loop and never guess a different `version` or field semantics:
+
+| Rejection symptom | Mapped **Pre-flight Self-check** line | Deterministic fix |
+|---|---|---|
+| Missing or non-`1` `version` | "`version` is exactly 1" | Stop if the source data declares another version (see `docs/contract.md`); otherwise set `version` to `1` when constructing a v1 payload yourself. |
+| Unknown root key or extra property (including `genuiOccurrence`) | "Root keys are only `version` and `components`" | Remove only the undeclared key(s); never rename unknown keys by guesswork. |
+| Empty or oversized `components` array | "Component count is within the call cap" | If empty, skip `render_ui` and answer in prose; if over the cap, keep the most important components first and drop trailing ones. |
+| Missing `type`, `title`, or widget required field | "Every component has `type` and `title`, plus its widget's required fields" | Populate the missing required field from already-verified data; if unavailable, abort the card and report in prose. |
+| Unknown or non-string `type` | "Every `type` is one of `stat`, `table`, `bar_chart`, `checklist`" | Pick the matching widget among those four; if none fits, abort and render Markdown prose. |
+| Empty, whitespace-only, over-length, or non-string text field | "Every string is non-empty, not whitespace-only, and within its length cap" | Rewrite to concise plain text within the cap, or drop the optional field (`detail`, `unit`); never truncate values silently. |
+| Angle brackets, URI scheme, `//`, or control/format/bidi/line char | "No string contains angle brackets, URI schemes, protocol-relative paths, or control/format/bidi/line characters" | Strip markup/control characters from card fields and move URLs into surrounding Markdown prose. |
+| Non-finite, negative (on `bar_chart`), or out-of-range number | "Numbers are finite and within their ranges" | Use verified finite numbers in range, or drop the card and report in prose. |
+| Table row cell count differs from `columns` | "Every table row has exactly as many cells as `columns`" | Align cells to `columns` using verified data only; never fabricate values. |
+| Invalid or duplicate checklist `id` | "Checklist `id`s match the id pattern and are unique within their component" | Normalize each `id` to `[a-zA-Z0-9_-]` and deduplicate deterministically (e.g., `-2`, `-3`). |
+| Payload exceeds byte cap (`too_large`) | "The serialized payload is within the byte cap" | Apply **Pruning Under the Byte Cap** steps in order. |
+
+**Retry cap:** Re-run the full **Pre-flight Self-check** on the repaired payload and re-issue `render_ui` **at most 1 retry** after the initial `bad_args` rejection. If the single retry is still rejected (or if `not_enabled` / `app_unavailable` occurs, which takes zero retries), stop calling `render_ui`, explain the rejection cleanly in Markdown prose, and present the verified data as plain text.
 
 ## Interaction Semantics
 

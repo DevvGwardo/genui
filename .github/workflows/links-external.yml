@@ -1,0 +1,34 @@
+# genui — scheduled external link verification (G4).
+#
+# Runs weekly and on manual dispatch so transient upstream network outages do
+# not block regular PR CI. Actions are pinned by commit SHA.
+name: links-external
+
+on:
+  schedule:
+    # Weekly on Mondays at 07:23 UTC (off the hour).
+    - cron: "23 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: links-external
+  cancel-in-progress: true
+
+jobs:
+  external-links:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node 20
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "20"
+
+      - name: Check relative and external http(s) links
+        run: node tools/check-links.mjs --external

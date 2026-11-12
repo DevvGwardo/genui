@@ -18,7 +18,7 @@ const REGISTER = path.join(root, "docs", "errors.md");
 
 const TOKEN = /\b[a-z]{3,}_[a-z]{3,}\b/g;
 const TEXT_EXTENSIONS = new Set([".md", ".json", ".mjs", ".js", ".py", ".yml", ".yaml"]);
-const SKIP_DIRS = new Set([".git", "node_modules"]);
+const SKIP_DIRS = new Set([".git", "node_modules", "dist"]);
 
 // Identifiers that are not error codes: interface names, standard-library
 // keywords, and well-known filesystem names. Keep this list short and boring;
@@ -29,13 +29,32 @@ const NON_ERROR_TOKENS = new Set([
   "tool_call",
   "bar_chart",
   "node_modules",
-  // stdlib JSON keyword used by tools/validate.py for exact byte sizing
+  // Node.js built-in module used by tools/fuzz-validator.mjs
+  "child_process",
+  // Python stdlib sys attribute used by tools/fuzz-validator.mjs
+  "version_info",
+  // stdlib JSON keywords used by tools/validate.py
   "ensure_ascii",
+  "allow_nan",
+  "parse_constant",
   // internal function names in tools/validate.py (the astral-plane text filter)
   "astral_offender",
   "scan_astral",
-  // GitHub Actions event keyword used by .github/workflows/ci.yml
+  // stdlib zipfile.ZipInfo attributes used by tools/package-skill.py
+  "create_system",
+  "external_attr",
+  // GitHub Actions event keywords used by .github/workflows/*.yml
   "pull_request",
+  "workflow_dispatch",
+  // GitHub REST API fields used by tools/check-upstream.mjs
+  "per_page",
+  "previous_filename",
+  // tracked upstream file basenames in upstream/sources.json and docs/upstream-sources.md
+  "package_skill",
+  "quick_validate",
+  "skill_linter",
+  "skill_utils",
+  "skills_guard",
 ]);
 
 const MIN_DECLARED = 4; // sanity floor: the four canonical codes

@@ -8,7 +8,8 @@ Schema cannot express portably, the 16,384-byte cap, table row lengths equal to
 the column count, and unique checklist ids within a component.
 
 Usage:
-    python3 tools/validate.py FILE [FILE ...]
+    python3 tools/validate.py [--json] FILE [FILE ...]
+    python3 tools/validate.py --jsonl < input.jsonl
 
 Exit status: 0 when every file is valid; 1 when any file is invalid or cannot
 be read; 2 on a usage error.
@@ -18,14 +19,18 @@ Output: one line per file -
     <file>: invalid code=<code> reason=<reason> at <pointer>
 code is bad_args, too_large, or none. none means "rejected, but v1 docs name no
 code for this rejection" (see docs/errors.md) - a code is never guessed.
+With --json, prints one JSON object per line with ok, code, reason, pointer,
+and preflightRule mapped to SKILL.md's Pre-flight Self-check rules.
 """
 import json
+import math
 import re
 import sys
 from pathlib import Path
 
 SCHEMA = Path(__file__).resolve().parent.parent / "schema" / "v1.json"
 CAP = 16384  # the byte cap from docs/contract.md; the schema $comment notes it too
+MAXDEPTH = 32
 CACHE = {}
 
 # Astral-plane (above U+FFFF) format characters, rejected by the runtime text
@@ -71,10 +76,40 @@ def same(left, right):
     return left == right
 
 
+def escptr(token):
+    return str(token).replace("~", "~0").replace("/", "~1")
+
+
+def ptrjoin(base, token):
+    return base + "/" + escptr(token)
+
+
+def rejectconst(token):
+    raise ValueError("non-finite JSON constant: " + token)
+
+
+def depthcheck(rootval):
+    stack = [(rootval, 0, "")]
+    while stack:
+        val, depth, ptr = stack.pop()
+        if depth > MAXDEPTH:
+            return ptr
+        if isinstance(val, dict):
+            for k in reversed(list(val.keys())):
+                stack.append((val[k], depth + 1, ptrjoin(ptr, k)))
+        elif isinstance(val, list):
+            for i in range(len(val) - 1, -1, -1):
+                stack.append((val[i], depth + 1, ptrjoin(ptr, i)))
+    return None
+
+
 def matches(pattern, text):
     prog = CACHE.get(pattern)
     if prog is None:
-        prog = re.compile(pattern)
+        if pattern.startswith("^") and pattern.endswith("$"):
+            prog = re.compile(r"\A" + pattern[1:-1] + r"\Z")
+        else:
+            prog = re.compile(pattern)
         CACHE[pattern] = prog
     return prog.search(text) is not None
 
@@ -118,16 +153,23 @@ def run(value, sch, root, pointer, out):
             if want is not None:
                 disc[want] = tgt
         if disc and len(disc) == len(subs):
-            tag = value.get("type") if isinstance(value, dict) else None
-            if tag in disc:
-                run(value, disc[tag], root, pointer, out)
+            if not isinstance(value, dict):
+                add(out, pointer, "type", "expected object, found " + kindof(value))
+            elif "type" not in value:
+                add(out, ptrjoin(pointer, "type"), "required", "missing type")
             else:
-                add(
-                    out,
-                    pointer,
-                    "discriminator",
-                    "component type " + json.dumps(tag) + " is not one of " + ", ".join(disc),
-                )
+                tag = value["type"]
+                if not isinstance(tag, str):
+                    add(out, ptrjoin(pointer, "type"), "type", "expected string, found " + kindof(tag))
+                elif tag in disc:
+                    run(value, disc[tag], root, pointer, out)
+                else:
+                    add(
+                        out,
+                        pointer,
+                        "discriminator",
+                        "component type " + json.dumps(tag) + " is not one of " + ", ".join(disc),
+                    )
         else:
             hits = [sub for sub in subs if ok(value, sub, root)]
             if len(hits) != 1:
@@ -139,14 +181,14 @@ def run(value, sch, root, pointer, out):
         props = sch.get("properties", {})
         for name in sch.get("required", []):
             if name not in value:
-                add(out, pointer + "/" + name, "required", "missing " + name)
+                add(out, ptrjoin(pointer, name), "required", "missing " + name)
         if sch.get("additionalProperties") is False:
             for name in value:
                 if name not in props:
-                    add(out, pointer + "/" + name, "additionalProperties", "unexpected property " + name)
+                    add(out, ptrjoin(pointer, name), "additionalProperties", "unexpected property " + name)
         for name, sub in props.items():
             if name in value:
-                run(value[name], sub, root, pointer + "/" + name, out)
+                run(value[name], sub, root, ptrjoin(pointer, name), out)
     if isinstance(value, list):
         if "minItems" in sch and len(value) < sch["minItems"]:
             add(out, pointer, "minItems", "needs at least " + str(sch["minItems"]) + " items")
@@ -154,7 +196,7 @@ def run(value, sch, root, pointer, out):
             add(out, pointer, "maxItems", "allows at most " + str(sch["maxItems"]) + " items")
         if "items" in sch:
             for i, item in enumerate(value):
-                run(item, sch["items"], root, pointer + "/" + str(i), out)
+                run(item, sch["items"], root, ptrjoin(pointer, i), out)
     if isinstance(value, str):
         if "minLength" in sch and len(value) < sch["minLength"]:
             add(out, pointer, "minLength", "needs at least " + str(sch["minLength"]) + " characters")
@@ -163,10 +205,13 @@ def run(value, sch, root, pointer, out):
         if "pattern" in sch and not matches(sch["pattern"], value):
             add(out, pointer, "pattern", "does not match the required pattern")
     if isinstance(value, (int, float)) and not isinstance(value, bool):
-        if "minimum" in sch and value < sch["minimum"]:
-            add(out, pointer, "minimum", "must be at least " + str(sch["minimum"]))
-        if "maximum" in sch and value > sch["maximum"]:
-            add(out, pointer, "maximum", "must be at most " + str(sch["maximum"]))
+        if isinstance(value, float) and not math.isfinite(value):
+            add(out, pointer, "notFinite", "must be finite")
+        else:
+            if "minimum" in sch and value < sch["minimum"]:
+                add(out, pointer, "minimum", "must be at least " + str(sch["minimum"]))
+            if "maximum" in sch and value > sch["maximum"]:
+                add(out, pointer, "maximum", "must be at most " + str(sch["maximum"]))
     return out
 
 
@@ -184,6 +229,7 @@ def verdict(rec):
         "anyOf": ("bad_args", "invalid type"),
         "oneOf": ("bad_args", "invalid type"),
         "not": (None, "string filter"),
+        "notFinite": (None, "bound violation"),
         "pattern": (None, "bound violation"),
         "minItems": (None, "bound violation"),
         "maxItems": (None, "bound violation"),
@@ -195,10 +241,50 @@ def verdict(rec):
     return table.get(kw, (None, "unclassified keyword " + kw))
 
 
+def preflight(kw, reason, pointer):
+    if reason == "unparseable JSON":
+        return None
+    if reason == "over byte cap":
+        return "The serialized payload is within the byte cap"
+    if reason == "row length mismatch":
+        return "Every table row has exactly as many cells as columns"
+    if reason == "duplicate id":
+        return "Checklist ids match the id pattern and are unique within their component"
+    if reason == "string filter" or kw == "not":
+        return "No string contains angle brackets, URI schemes, protocol-relative paths, or control/format/bidi/line characters"
+    if reason == "unknown version" or pointer == "/version":
+        return "version is exactly 1"
+    if pointer.endswith("/id") and pointer.startswith("/components/"):
+        return "Checklist ids match the id pattern and are unique within their component"
+    if kw == "discriminator" or (kw == "type" and pointer.endswith("/type")):
+        return "Every type is one of stat, table, bar_chart, checklist"
+    if kw == "additionalProperties":
+        if pointer.count("/") == 1:
+            return "Root keys are only version and components"
+        return "Every component has type and title, plus its widget's required fields"
+    if kw == "required":
+        if pointer == "/version":
+            return "version is exactly 1"
+        if pointer == "/components":
+            return "Component count is within the call cap"
+        return "Every component has type and title, plus its widget's required fields"
+    if pointer == "/components" and kw in ("minItems", "maxItems", "type"):
+        return "Component count is within the call cap"
+    if kw in ("minLength", "maxLength", "pattern"):
+        return "Every string is non-empty, not whitespace-only, and within its length cap"
+    if kw in ("minimum", "maximum", "notFinite"):
+        return "Numbers are finite and within their ranges"
+    if pointer == "" and kw == "type":
+        return "Root keys are only version and components"
+    return "Every component has type and title, plus its widget's required fields"
+
+
 def astral_offender(text):
-    """Return the first astral-plane format character in text, or None."""
+    """Return the first astral-plane format character or lone surrogate in text, or None."""
     for ch in text:
         cp = ord(ch)
+        if 0xD800 <= cp <= 0xDFFF:
+            return cp
         if cp < 0x10000:
             continue
         for lo, hi in ASTRAL_FORMAT_RANGES:
@@ -208,26 +294,41 @@ def astral_offender(text):
 
 
 def scan_astral(value, pointer, out):
-    """Collect astral-plane format-character violations with JSON pointers."""
+    """Collect astral-plane format-character and lone-surrogate violations with JSON pointers."""
     if isinstance(value, str):
         cp = astral_offender(value)
         if cp is not None:
-            add(out, pointer, "not", "astral format character U+%04X" % cp)
+            add(out, pointer, "not", "astral or surrogate character U+%04X" % cp)
     elif isinstance(value, dict):
         for name, sub in value.items():
-            scan_astral(sub, pointer + "/" + name, out)
+            scan_astral(sub, ptrjoin(pointer, name), out)
     elif isinstance(value, list):
         for i, item in enumerate(value):
-            scan_astral(item, pointer + "/" + str(i), out)
+            scan_astral(item, ptrjoin(pointer, i), out)
 
 
 def check(payload):
+    deep = depthcheck(payload)
+    if deep is not None:
+        return {
+            "ok": False,
+            "code": "bad_args",
+            "reason": "invalid type",
+            "pointer": deep,
+            "preflightRule": preflight("type", "invalid type", deep),
+        }
     out = []
     run(payload, ROOT, ROOT, "", out)
     if out:
         rec = out[0]
         code, reason = verdict(rec)
-        return {"ok": False, "code": code, "reason": reason, "pointer": rec["pointer"]}
+        return {
+            "ok": False,
+            "code": code,
+            "reason": reason,
+            "pointer": rec["pointer"],
+            "preflightRule": preflight(rec["keyword"], reason, rec["pointer"]),
+        }
     astral = []
     scan_astral(payload, "", astral)
     if astral:
@@ -238,52 +339,162 @@ def check(payload):
             "code": None,
             "reason": "string filter",
             "pointer": astral[0]["pointer"],
+            "preflightRule": preflight("not", "string filter", astral[0]["pointer"]),
         }
-    size = len(json.dumps(payload, separators=(",", ":"), ensure_ascii=False).encode("utf-8"))
+    try:
+        size = len(
+            json.dumps(
+                payload,
+                separators=(",", ":"),
+                ensure_ascii=False,
+                allow_nan=False,
+            ).encode("utf-8")
+        )
+    except UnicodeEncodeError:
+        return {
+            "ok": False,
+            "code": None,
+            "reason": "string filter",
+            "pointer": "",
+            "preflightRule": preflight("not", "string filter", ""),
+        }
+    except ValueError:
+        return {
+            "ok": False,
+            "code": None,
+            "reason": "bound violation",
+            "pointer": "",
+            "preflightRule": preflight("notFinite", "bound violation", ""),
+        }
     if size > CAP:
-        return {"ok": False, "code": "too_large", "reason": "over byte cap", "pointer": ""}
+        return {
+            "ok": False,
+            "code": "too_large",
+            "reason": "over byte cap",
+            "pointer": "",
+            "preflightRule": preflight(None, "over byte cap", ""),
+        }
     for i, comp in enumerate(payload["components"]):
         if comp["type"] == "table":
             width = len(comp["columns"])
             for ri, row in enumerate(comp["rows"]):
                 if len(row) != width:
+                    ptr = "/components/" + str(i) + "/rows/" + str(ri)
                     return {
                         "ok": False,
                         "code": None,
                         "reason": "row length mismatch",
-                        "pointer": "/components/" + str(i) + "/rows/" + str(ri),
+                        "pointer": ptr,
+                        "preflightRule": preflight(None, "row length mismatch", ptr),
                     }
         if comp["type"] == "checklist":
             ids = [item["id"] for item in comp["items"]]
             if len(set(ids)) != len(ids):
-                return {"ok": False, "code": None, "reason": "duplicate id", "pointer": "/components/" + str(i)}
-    return {"ok": True, "code": None, "reason": None, "pointer": ""}
+                ptr = "/components/" + str(i)
+                return {
+                    "ok": False,
+                    "code": None,
+                    "reason": "duplicate id",
+                    "pointer": ptr,
+                    "preflightRule": preflight(None, "duplicate id", ptr),
+                }
+    return {"ok": True, "code": None, "reason": None, "pointer": "", "preflightRule": None}
+
+
+def checkraw(rawbytes):
+    try:
+        payload = json.loads(rawbytes, parse_constant=rejectconst)
+    except RecursionError:
+        return {
+            "ok": False,
+            "code": "bad_args",
+            "reason": "invalid type",
+            "pointer": "",
+            "preflightRule": preflight("type", "invalid type", ""),
+        }
+    except (UnicodeDecodeError, ValueError):
+        return {
+            "ok": False,
+            "code": None,
+            "reason": "unparseable JSON",
+            "pointer": "",
+            "preflightRule": None,
+        }
+    return check(payload)
 
 
 def main(args):
-    if args in ([], ["-h"], ["--help"]):
+    jsonmode = False
+    jsonlmode = False
+    files = []
+    for arg in args:
+        if arg in ("-h", "--help") and not files and not jsonmode and not jsonlmode:
+            print("usage: python3 tools/validate.py [--json] FILE [FILE ...]")
+            return 0
+        if arg == "--json" and not files and not jsonlmode:
+            jsonmode = True
+        elif arg == "--jsonl" and not files and not jsonmode:
+            jsonlmode = True
+        elif arg.startswith("-") and arg != "-":
+            print("usage: python3 tools/validate.py [--json] FILE [FILE ...]", file=sys.stderr)
+            return 2
+        else:
+            files.append(arg)
+    if jsonlmode:
+        if files:
+            print("usage: python3 tools/validate.py --jsonl", file=sys.stderr)
+            return 2
+        bad = 0
+        for line in sys.stdin.buffer:
+            stripped = line.strip()
+            if not stripped:
+                continue
+            try:
+                rawtext = json.loads(stripped)
+                rawbytes = rawtext.encode("utf-8", errors="surrogatepass") if isinstance(rawtext, str) else stripped
+            except (UnicodeDecodeError, ValueError):
+                rawbytes = stripped
+            got = checkraw(rawbytes)
+            if not got["ok"]:
+                bad += 1
+            print(json.dumps(got, separators=(",", ":"), ensure_ascii=True))
+        return 1 if bad else 0
+    if not files:
         print("usage: python3 tools/validate.py FILE [FILE ...]")
-        return 2 if not args else 0
+        return 2
     bad = 0
-    for path in args:
+    for path in files:
         try:
             with open(path, "rb") as fh:
-                payload = json.loads(fh.read())
+                rawbytes = fh.read()
         except OSError as err:
-            print(path + ": error: cannot read: " + str(err), file=sys.stderr)
+            if jsonmode:
+                rec = {
+                    "file": path,
+                    "ok": False,
+                    "code": None,
+                    "reason": "cannot read: " + str(err),
+                    "pointer": "",
+                    "preflightRule": None,
+                }
+                print(json.dumps(rec, separators=(",", ":"), ensure_ascii=True))
+            else:
+                print(path + ": error: cannot read: " + str(err), file=sys.stderr)
             bad += 1
             continue
-        except (UnicodeDecodeError, ValueError):
-            print(path + ": invalid code=none reason=unparseable JSON")
+        got = checkraw(rawbytes)
+        if not got["ok"]:
             bad += 1
-            continue
-        got = check(payload)
-        if got["ok"]:
-            print(path + ": valid")
+        if jsonmode:
+            rec = {"file": path}
+            rec.update(got)
+            print(json.dumps(rec, separators=(",", ":"), ensure_ascii=True))
         else:
-            tail = " at " + got["pointer"] if got["pointer"] else ""
-            print(path + ": invalid code=" + (got["code"] or "none") + " reason=" + got["reason"] + tail)
-            bad += 1
+            if got["ok"]:
+                print(path + ": valid")
+            else:
+                tail = " at " + got["pointer"] if got["pointer"] else ""
+                print(path + ": invalid code=" + (got["code"] or "none") + " reason=" + got["reason"] + tail)
     return 1 if bad else 0
 
 

@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "sources": [
+    {
+      "repo": "NousResearch/hermes-agent",
+      "license": "MIT",
+      "defaultBranch": "main",
+      "pinnedSha": "67664e236ddcc45824b871d575677287599af152",
+      "watchedPaths": [
+        "agent/skill_utils.py",
+        "tools/skill_linter.py",
+        "tools/skills_guard.py",
+        "tests/skills/test_authoring_standards.py"
+      ],
+      "inheritedPattern": "Hermes Agent skill discovery limits (60-char description ending in a period, platforms list) and authoring/security lint rules.",
+      "localAdaptations": "Tightened skills/genui/SKILL.md frontmatter description and added platforms: [macos, linux, windows]; ported frontmatter, path-hygiene, and static security-guard checks into zero-dep Node tools/check-skill-frontmatter.mjs.",
+      "exclusions": "Excluded Python runtime dependencies, skill-hub installers, and multi-skill sync machinery.",
+      "verifyingCheck": "node tools/check-skill-frontmatter.mjs"
+    },
+    {
+      "repo": "DevvGwardo/hermes-desk",
+      "license": "MIT",
+      "defaultBranch": "main",
+      "pinnedSha": "ab3d420d85b4f19c390526d1f0416b5255f61b48",
+      "watchedPaths": [
+        "electron/local/mcp/genui.mjs",
+        "electron/local/mcp/genui.test.mjs",
+        "electron/local/mcp/tools.cjs",
+        "electron/local/mcp/dispatch.cjs"
+      ],
+      "inheritedPattern": "MCP host runtime validator guards (prototype, descriptor, sparse-array, and recursion-depth protection; Unicode Cc/Cf/Zl/Zp filtering) and server-minted genuiOccurrence trust boundary.",
+      "localAdaptations": "Added prototype-key, unhashable-type, depth, and lone-surrogate guards in tools/validate.py and tools/fuzz-validator.mjs; documented the genuiOccurrence boundary in docs/security.md.",
+      "exclusions": "Excluded Electron host UI, IPC socket server, and experimental fifth-widget proposals outside v1 (deferred to LOOPS.md Proposed contract changes).",
+      "verifyingCheck": "node tools/fuzz-validator.mjs"
+    },
+    {
+      "repo": "a2ui-project/a2ui",
+      "license": "Apache-2.0",
+      "defaultBranch": "main",
+      "pinnedSha": "8bf644a37d680a227296b8c0849a7f4b328b8b73",
+      "watchedPaths": [
+        "specification/scripts/validate.py",
+        "eval/DESIGN.md"
+      ],
+      "inheritedPattern": "Cross-validator conformance testing and deterministic Stage-1/Stage-2 evaluation funnel prior to LLM judging.",
+      "localAdaptations": "Built zero-dep differential fuzzer (tools/fuzz-validator.mjs) and deterministic Stage-1/Stage-2 skill eval corpus (evals/evals.json + tools/check-evals.mjs).",
+      "exclusions": "Excluded interactive action callbacks (updateDataModel/functionCall), npm ajv dependency, and Inspect AI runtime.",
+      "verifyingCheck": "node tools/check-evals.mjs"
+    },
+    {
+      "repo": "anthropics/skills",
+      "license": "Apache-2.0",
+      "defaultBranch": "main",
+      "pinnedSha": "2c5958ecac7cee2b583967a2c4981d0f4a75c579",
+      "watchedPaths": [
+        "skills/skill-creator/scripts/package_skill.py",
+        "skills/skill-creator/scripts/quick_validate.py",
+        "skills/skill-creator/references/schemas.md"
+      ],
+      "inheritedPattern": "Deterministic skill zip packaging excluding dev/eval artifacts and golden evals.json schema with programmatic dataset audit checks.",
+      "localAdaptations": "Implemented zero-dep reproducible packager (tools/package-skill.py) emitting fixed-timestamp dist/genui-skill.zip plus SHA-256, and golden evals/evals.json checked by tools/check-evals.mjs.",
+      "exclusions": "Excluded PyYAML dependency, interactive eval-viewer HTML server, and Anthropic API-specific workflows.",
+      "verifyingCheck": "python3 tools/package-skill.py --verify"
+    },
+    {
+      "repo": "vercel-labs/json-render",
+      "license": "Apache-2.0",
+      "defaultBranch": "main",
+      "pinnedSha": "18194121c8f087afacd9a8ef65fbda18374ee039",
+      "watchedPaths": [
+        "packages/core/src/spec-validator.ts",
+        "packages/core/src/spec-validator.test.ts"
+      ],
+      "inheritedPattern": "Structured machine-readable validation diagnostics mapped to actionable repair hints for bounded single-retry self-correction.",
+      "localAdaptations": "Added --json diagnostic output in tools/validate.py emitting { ok, code, reason, pointer, preflightRule } and documented the single-retry bad_args repair loop in skills/genui/SKILL.md.",
+      "exclusions": "Excluded reactive state/visibility expression runtime, streaming patches, and React/Vue renderers.",
+      "verifyingCheck": "python3 tools/check-examples.py"
+    },
+    {
+      "repo": "omdsh-dev/dsh-genui",
+      "license": "MIT",
+      "defaultBranch": "main",
+      "pinnedSha": "3cc1f153716b0ff710f1dcc9c46bab83b3911c4a",
+      "watchedPaths": [
+        "THIRD_PARTY_NOTICES.md",
+        ".github/workflows/release.yml"
+      ],
+      "inheritedPattern": "Pinned-SHA third-party provenance ledger and release tag-to-version verification gate.",
+      "localAdaptations": "Adopted pinned-SHA provenance tracking in upstream/sources.json plus docs/upstream-sources.md and tag-vs-SKILL.md version verification in .github/workflows/release.yml.",
+      "exclusions": "Excluded ECharts/Three.js/Mermaid renderers, interactive form widgets, and npm/pnpm build toolchain.",
+      "verifyingCheck": "node tools/check-upstream.mjs"
+    },
+    {
+      "repo": "DevvGwardo/hermes-patterns",
+      "license": "MIT",
+      "defaultBranch": "main",
+      "pinnedSha": "07842a399cfc783cf9790788fd6234ee58286e71",
+      "watchedPaths": [
+        "skills/adversarial-verify"
+      ],
+      "inheritedPattern": "Adversarial boundary verification checklist (empty strings, non-finite numbers, extreme bounds, Unicode edge cases) with command-evidenced verdicts.",
+      "localAdaptations": "Codified the text/parser threat model in docs/security.md backed by deterministic invalid fixtures in examples/invalid/.",
+      "exclusions": "Excluded unrelated orchestration, memory, and cron skills.",
+      "verifyingCheck": "python3 tools/check-examples.py"
+    },
+    {
+      "repo": "DevvGwardo/fork-sync",
+      "license": "Unspecified",
+      "defaultBranch": "main",
+      "pinnedSha": "acdfa6ded17693a7ae291a3f5ad22e9458f16f08",
+      "watchedPaths": [
+        "sync.py",
+        ".github/workflows/sync.yml"
+      ],
+      "inheritedPattern": "Non-mutating scheduled upstream watch workflow emitting a JSON plan artifact and exit code 2 when human triage is needed.",
+      "localAdaptations": "Implemented tools/check-upstream.mjs --watch and .github/workflows/upstream-watch.yml for read-only drift reporting with zero auto-merging.",
+      "exclusions": "Excluded automated git fast-forward/merge-upstream mutations and PAT-based multi-repo writes.",
+      "verifyingCheck": "node tools/check-upstream.mjs"
+    }
+  ]
+}

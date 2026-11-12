@@ -6,7 +6,8 @@
 // — for markdown links/images and HTML href/src attributes:
 //
 //   - external targets (a URI scheme such as https:, or a protocol-relative
-//     //host path) are skipped: the check is offline by design;
+//     //host path) are skipped in default offline mode; pass --external to
+//     verify http(s) URLs with Node 20+ fetch (HEAD -> GET fallback with retry);
 //   - every relative path target must exist relative to the file that links
 //     it (file or directory);
 //   - every `#anchor` target must resolve to a heading in its target file
@@ -18,15 +19,25 @@
 // examples of link syntax inside docs are not checked; anchors on non-Markdown
 // targets are not resolved (nothing to resolve against).
 //
-// Usage:  node tools/check-links.mjs   (exit 0 = every relative link resolves)
+// Usage:  node tools/check-links.mjs              (offline relative/anchor check)
+//         node tools/check-links.mjs --external   (also verify http/https URLs)
 
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const SKIP_DIRS = new Set([".git", "node_modules"]);
+const SKIP_DIRS = new Set([".git", "node_modules", "dist"]);
 const CANDIDATE = /!?\[[^\]]*\]\(([^)]+)\)|(?:href|src)\s*=\s*["']([^"']+)["']/gi;
+
+const args = process.argv.slice(2);
+const checkExternal = args.includes("--external");
+let timeoutMs = 10000;
+const timeoutIdx = args.indexOf("--timeout");
+if (timeoutIdx !== -1 && args[timeoutIdx + 1]) {
+  const parsed = Number(args[timeoutIdx + 1]);
+  if (Number.isFinite(parsed) && parsed > 0) timeoutMs = parsed;
+}
 
 function walk(dir) {
   const out = [];
@@ -111,6 +122,7 @@ let relative = 0;
 let anchors = 0;
 let external = 0;
 let violations = 0;
+const externalRefs = new Map();
 
 for (const relFile of files) {
   const absFile = path.join(root, relFile);
@@ -123,6 +135,11 @@ for (const relFile of files) {
     }
     if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(target) || target.startsWith("//")) {
       external++;
+      const normalized = target.startsWith("//") ? `https:${target}` : target;
+      if (/^https?:/i.test(normalized)) {
+        if (!externalRefs.has(normalized)) externalRefs.set(normalized, []);
+        externalRefs.get(normalized).push(`${relFile}:${c.line}`);
+      }
       continue;
     }
 
@@ -158,9 +175,80 @@ for (const relFile of files) {
   }
 }
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function probeUrl(url) {
+  const headers = {
+    "User-Agent": "genui-link-check/1.0 (+https://github.com/DevvGwardo/genui)",
+    Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  };
+  const backoffs = [500, 1500];
+  let lastError = null;
+
+  for (let attempt = 0; attempt <= backoffs.length; attempt++) {
+    try {
+      let res = await fetch(url, {
+        method: "HEAD",
+        headers,
+        redirect: "follow",
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+      await res.body?.cancel();
+      if (res.status === 400 || res.status === 403 || res.status === 405 || res.status === 501) {
+        res = await fetch(url, {
+          method: "GET",
+          headers,
+          redirect: "follow",
+          signal: AbortSignal.timeout(timeoutMs),
+        });
+        await res.body?.cancel();
+      }
+      if (res.ok) return { ok: true, status: res.status };
+      if ((res.status === 429 || res.status >= 500) && attempt < backoffs.length) {
+        const retryAfter = Number(res.headers.get("retry-after"));
+        const delay = Number.isFinite(retryAfter) && retryAfter > 0 && retryAfter <= 5 ? retryAfter * 1000 : backoffs[attempt];
+        await sleep(delay);
+        continue;
+      }
+      return { ok: false, status: res.status, reason: res.statusText || `HTTP ${res.status}` };
+    } catch (err) {
+      lastError = err;
+      if (attempt < backoffs.length) {
+        await sleep(backoffs[attempt]);
+        continue;
+      }
+    }
+  }
+  return { ok: false, status: 0, reason: lastError?.message || "request failed" };
+}
+
 console.log(`link check: ${files.length} markdown file(s) scanned`);
-console.log(`  relative targets: ${relative} checked, ${external} external skipped`);
+console.log(
+  `  relative targets: ${relative} checked, ${external} external ${checkExternal ? "found" : "skipped"}`
+);
 console.log(`  anchors: ${anchors} checked`);
+
+if (checkExternal) {
+  let extFailed = 0;
+  console.log(`  external URLs: checking ${externalRefs.size} unique http(s) target(s) (timeout ${timeoutMs}ms)`);
+  for (const [url, refs] of [...externalRefs].sort(([a], [b]) => a.localeCompare(b))) {
+    const result = await probeUrl(url);
+    if (result.ok) {
+      console.log(`    ok   ${result.status} ${url}`);
+    } else {
+      extFailed++;
+      violations++;
+      console.error(`    FAIL ${result.status || "ERR"} ${url} (${result.reason}) — ${refs.join(", ")}`);
+    }
+  }
+  if (violations === 0) {
+    console.log("PASS: every relative link, anchor, and external URL resolves.");
+    process.exit(0);
+  }
+  console.error(`FAIL: ${violations} broken link(s) (${extFailed} external).`);
+  process.exit(1);
+}
+
 if (violations === 0) {
   console.log("PASS: every relative link and anchor resolves (offline check; external URLs skipped).");
   process.exit(0);

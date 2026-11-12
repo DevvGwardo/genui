@@ -8,6 +8,13 @@
     { "file": "bound-violation.json", "expectedCode": null, "kind": "bound violation" },
     { "file": "unknown-version.json", "expectedCode": null, "kind": "unknown version" },
     { "file": "duplicate-checklist-id.json", "expectedCode": null, "kind": "duplicate id" },
-    { "file": "astral-format-char.json", "expectedCode": null, "kind": "string filter" }
+    { "file": "astral-format-char.json", "expectedCode": null, "kind": "string filter" },
+    { "file": "mixed-case-scheme.json", "expectedCode": null, "kind": "string filter" },
+    { "file": "bidi-override.json", "expectedCode": null, "kind": "string filter" },
+    { "file": "zwj-emoji.json", "expectedCode": null, "kind": "string filter" },
+    { "file": "unhashable-type.json", "expectedCode": "bad_args", "kind": "invalid type" },
+    { "file": "non-finite-number.json", "expectedCode": null, "kind": "unparseable JSON" },
+    { "file": "genui-occurrence-spoof.json", "expectedCode": "bad_args", "kind": "extra property" },
+    { "file": "proto-key.json", "expectedCode": "bad_args", "kind": "extra property" }
   ]
 }

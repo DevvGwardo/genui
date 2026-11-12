@@ -1,0 +1,85 @@
+# genui — reproducible release workflow (Stage 4 + G3).
+#
+# Triggered on v* tag pushes. Verifies tag parity against skills/genui/SKILL.md
+# version, runs the full CI verification suite, packages deterministic
+# dist/genui-skill.zip + .sha256, and attaches both to the GitHub Release.
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node 20
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "20"
+
+      - name: Verify tag matches skills/genui/SKILL.md version
+        run: |
+          SKILL_VER="$(node -e '
+            const fs = require("node:fs");
+            const text = fs.readFileSync("skills/genui/SKILL.md", "utf8");
+            const fm = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+            const m = fm && fm[1].match(/^version:\s*["'\'']?([0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.-]+)?)["'\'']?\s*$/m);
+            if (!m) {
+              console.error("Could not parse version from skills/genui/SKILL.md");
+              process.exit(1);
+            }
+            process.stdout.write(m[1]);
+          ')"
+          if [ "${GITHUB_REF_NAME}" != "v${SKILL_VER}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match skills/genui/SKILL.md version v${SKILL_VER}"
+            exit 1
+          fi
+          echo "Verified release tag ${GITHUB_REF_NAME} matches SKILL.md version ${SKILL_VER}."
+
+      - name: Run full CI verification suite
+        run: |
+          node tools/check-bounds.mjs
+          node tools/check-errors.mjs
+          node tools/check-terms.mjs
+          node tools/check-skill-frontmatter.mjs
+          node tools/check-links.mjs
+          node tools/check-docs-budget.mjs
+          python3 tools/check-examples.py
+          python3 tools/check-doc-payloads.py
+          node tools/fuzz-validator.mjs
+          node tools/check-evals.mjs
+          node tools/check-upstream.mjs
+
+      - name: Build and verify reproducible skill archive
+        run: python3 tools/package-skill.py --verify
+
+      - name: Publish skill artifacts to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/genui-skill.zip dist/genui-skill.zip.sha256 --clobber
+          else
+            EXTRA_FLAGS=()
+            if [[ "$TAG" == *-* ]]; then
+              EXTRA_FLAGS+=(--prerelease)
+            fi
+            gh release create "$TAG" dist/genui-skill.zip dist/genui-skill.zip.sha256 \
+              --title "$TAG" \
+              --generate-notes \
+              "${EXTRA_FLAGS[@]}"
+          fi

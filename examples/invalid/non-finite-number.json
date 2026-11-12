@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "bar_chart",
+      "title": "Non-finite numeric value",
+      "items": [
+        { "label": "latency", "value": NaN }
+      ]
+    }
+  ]
+}

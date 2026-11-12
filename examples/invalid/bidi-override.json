@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "type": "stat",
+      "title": "Bidirectional override character",
+      "value": "Report \u202Egpj.exe"
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+# genui — non-mutating upstream watch (Stage 1 of upstream inheritance).
+#
+# Checks watched paths in upstream/sources.json against remote HEADs via the
+# GitHub REST API. Never mutates repository files or auto-merges; writes a
+# JSON plan artifact and job summary when watched paths move ahead.
+name: upstream-watch
+
+on:
+  schedule:
+    # Weekly on Mondays at 08:37 UTC (off the hour).
+    - cron: "37 8 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: upstream-watch
+  cancel-in-progress: true
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node 20
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "20"
+
+      - name: Query tracked upstream watched paths
+        id: watch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          node tools/check-upstream.mjs --watch --out upstream-plan.json
+          STATUS=$?
+          set -e
+
+          node -e '
+            const fs = require("node:fs");
+            const lines = ["## Upstream Watch Summary", ""];
+            if (!fs.existsSync("upstream-plan.json")) {
+              lines.push("No plan file produced.");
+            } else {
+              const plan = JSON.parse(fs.readFileSync("upstream-plan.json", "utf8"));
+              lines.push(`Checked ${plan.total} repo(s) at ${plan.checkedAt}: current=${plan.current}, aheadUnwatched=${plan.aheadUnwatched}, drifted=${plan.drifted}, errors=${plan.errors}`, "");
+              lines.push("| Repo | Status | Pinned | Head | Changed Watched Paths |");
+              lines.push("|---|---|---|---|---|");
+              for (const r of plan.results) {
+                const pinned = r.pinnedSha ? r.pinnedSha.slice(0, 7) : "-";
+                const head = r.headSha ? r.headSha.slice(0, 7) : "-";
+                const changed = r.changedWatchedPaths?.length ? r.changedWatchedPaths.join(", ") : "-";
+                lines.push(`| ${r.repo} | ${r.status} | \`${pinned}\` | \`${head}\` | ${changed} |`);
+              }
+            }
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\n") + "\n");
+          '
+
+          if [ "$STATUS" -eq 2 ]; then
+            echo "::warning::One or more upstream watchedPaths changed ahead of pinnedSha; review upstream-plan.json for curated adaptation."
+            exit 0
+          fi
+          exit "$STATUS"
+
+      - name: Upload upstream plan artifact
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: upstream-plan
+          path: upstream-plan.json
+          if-no-files-found: ignore
+          retention-days: 14
