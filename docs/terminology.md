@@ -8,8 +8,9 @@ Canonical terms for this repo. Everything else is drift. `tools/check-terms.mjs`
 | **Hermes Desk** | The desktop app that hosts conversations, executes `mcp__hermes_desk__render_ui`, and labels rendered blocks **Generated UI · Agent-provided data, not verified**. |
 | **genui** | This skill. Always lowercase (`name: genui` in the frontmatter; directory `skills/genui/`). |
 | **Generated UI** | The label Hermes Desk puts on rendered cards. A label, not a product or protocol name. |
-| **widget / component** | One rendered card. `widget` names the rendered result; `component` is the payload-level name under the `components` key. The four widget types: `stat`, `table`, `bar_chart`, `checklist`. |
+| **widget / component** | One rendered card. `widget` names the rendered result; `component` is the payload-level name under the `components` key. The four v1 widget types: `stat`, `table`, `bar_chart`, `checklist`; the v2 component catalog stages 22 widget types in total. |
 | **v1 payload contract** | The strict schema in `schema/v1.json` plus the bounds table in `docs/contract.md`. There is no separate protocol name; do not invent one. |
+| **v2 component catalog** | The staged 22-widget design catalog in `schema/v2.json` with `tools/validate-v2.py`, fixtures in `examples/v2/`, and a local previewer. Validated and previewable locally, but not dispatched — `render_ui` speaks the v1 payload contract only. Do not present it as a shipped contract. |
 
 ## Banned variants
 

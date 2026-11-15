@@ -45,7 +45,7 @@ Consistency check: `node tools/check-bounds.mjs` extracts the bound tokens below
 
 `SKILL.md` does not name a dedicated error code for an unknown `version`; the register in `docs/errors.md` records this rejection without guessing a code.
 
-**v2.** No v2 exists in this repo: no schema, no semantics, no compatibility promise. If a v2 ever ships, it must arrive as its own `schema/v2.json` (a new file, never an edit of v1) plus an update to this section in the same change; v1 payloads must keep validating against `schema/v1.json`. Until that change lands, a payload declaring a different `version` is out of contract for this repo and the fallback above applies.
+**v2.** A v2 component catalog exists in this repo as staged design tooling: `schema/v2.json` (a new file; `schema/v1.json` is frozen and v1 payloads keep validating against it), its validator `tools/validate-v2.py`, fixtures in `examples/v2/`, and a local previewer (`tools/preview.mjs`). It is not dispatched: `render_ui` in this repo still speaks v1 only, so a payload declaring `version: 2` is out of contract for dispatch and the unknown-version fallback above applies. No compatibility promise attaches to v2 yet — until it ships in Hermes Desk, its schema may still change.
 
 ## String filter (applies to every string field above)
 
