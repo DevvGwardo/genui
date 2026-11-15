@@ -1,0 +1,144 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "treemap",
+      "title": "Token footprint by subsystem",
+      "unit": "tokens",
+      "items": [
+        {
+          "label": "Tool schemas",
+          "value": 4200,
+          "group": "mcp",
+          "tone": "warn"
+        },
+        {
+          "label": "Conversation history",
+          "value": 3100,
+          "group": "core",
+          "tone": "neutral"
+        },
+        {
+          "label": "System prompt",
+          "value": 1850,
+          "group": "core",
+          "tone": "good"
+        },
+        {
+          "label": "Skill instructions",
+          "value": 920,
+          "group": "skills",
+          "tone": "good"
+        },
+        {
+          "label": "Memory block",
+          "value": 640,
+          "group": "core",
+          "tone": "neutral"
+        }
+      ]
+    },
+    {
+      "type": "radar_chart",
+      "title": "Model scorecard (v2 vs baseline)",
+      "max": 100,
+      "axes": [
+        "Safety",
+        "Latency",
+        "Accuracy",
+        "Cost",
+        "Coverage"
+      ],
+      "series": [
+        {
+          "name": "genui v2",
+          "values": [
+            99,
+            94,
+            96,
+            92,
+            100
+          ]
+        },
+        {
+          "name": "baseline",
+          "values": [
+            82,
+            71,
+            84,
+            68,
+            52
+          ]
+        }
+      ]
+    },
+    {
+      "type": "stacked_bar",
+      "title": "Request outcomes by region",
+      "unit": "k req",
+      "segments": [
+        "2xx OK",
+        "4xx Cached",
+        "5xx Error"
+      ],
+      "rows": [
+        {
+          "label": "us-east",
+          "values": [
+            84,
+            14,
+            2
+          ]
+        },
+        {
+          "label": "eu-west",
+          "values": [
+            62,
+            11,
+            1
+          ]
+        },
+        {
+          "label": "ap-east",
+          "values": [
+            45,
+            9,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "type": "slo_burn",
+      "title": "API availability burn rate",
+      "target": "99.95% (30d)",
+      "budgetRemainingPct": 84.2,
+      "windows": [
+        {
+          "window": "1h fast burn",
+          "burnRate": 0.8,
+          "threshold": 14.4,
+          "tone": "good"
+        },
+        {
+          "window": "6h medium burn",
+          "burnRate": 1.4,
+          "threshold": 6.0,
+          "tone": "good"
+        },
+        {
+          "window": "24h slow burn",
+          "burnRate": 1.9,
+          "threshold": 3.0,
+          "tone": "warn"
+        },
+        {
+          "window": "72h trend",
+          "burnRate": 0.6,
+          "threshold": 1.0,
+          "tone": "good"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "funnel_chart",
+      "title": "PR verification pipeline",
+      "unit": "runs",
+      "items": [
+        {
+          "stage": "Opened PRs",
+          "value": 420
+        },
+        {
+          "stage": "Contract & lint green",
+          "value": 392
+        },
+        {
+          "stage": "Fuzz & eval suite green",
+          "value": 368
+        },
+        {
+          "stage": "Merged to main",
+          "value": 354
+        }
+      ]
+    }
+  ]
+}

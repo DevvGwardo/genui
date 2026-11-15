@@ -209,6 +209,16 @@ When your serialized argument exceeds the byte cap in `docs/contract.md`, apply 
 
 Never truncate a string or a number, and never silently change a value, to make room — dropping is the only pruning move.
 
+## Designing High-Signal Cards
+
+Within the strict v1 bounds, small formatting choices make cards noticeably easier to scan:
+
+- **Lead with the headline, then break it down**: In multi-card layouts, place `stat` cards first for headline KPIs, follow with `bar_chart` or `table` for comparison, and finish with `checklist` for next actions.
+- **Keep `stat` values punchy**: Put the primary figure in `value` (`42 pts`, `3m 42s`, `+14.2%`) and put comparison context or deltas in `detail` (`p50 over the last 20 runs`, `+4 vs last week`).
+- **Sort `bar_chart` items for instant comparison**: Order bars descending by `value` (unless chronological order is meaningful) and always include `unit` so scales read clearly without extra prose.
+- **Make `table` columns scannable**: Use short 1–2 word headers and keep numeric precision consistent down each column (`12.4 ms`, `8.1 ms`).
+- **Write action-first `checklist` labels**: Start each `label` with a concrete verb (`Verify profile scope`, `Tag the release`) and derive `id` deterministically from the label.
+
 ## Pitfalls
 
 - **Markup or links inside card strings.** Failure: strings such as `<b>` and `https://...` are rejected by the text filter, so the call fails and the turn is wasted. Fix: keep card strings plain; put links and formatting in your surrounding Markdown prose.

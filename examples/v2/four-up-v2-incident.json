@@ -1,0 +1,73 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "alert",
+      "title": "Rate limit threshold approaching",
+      "severity": "warn",
+      "message": "Worker pool us-east-2 is at 91% of hourly token quota.",
+      "items": [
+        "Batch non-urgent eval runs onto the secondary profile",
+        "Quota resets in 18 minutes at 15:00 UTC"
+      ]
+    },
+    {
+      "type": "key_value",
+      "title": "Build environment",
+      "items": [
+        {
+          "key": "Profile",
+          "value": "production-us-east",
+          "tone": "good"
+        },
+        {
+          "key": "Runtime",
+          "value": "Node 20.18 + Python 3.12",
+          "tone": "neutral"
+        },
+        {
+          "key": "Commit",
+          "value": "cb91d83 (signed)",
+          "tone": "neutral"
+        },
+        {
+          "key": "Drift",
+          "value": "0 watched paths ahead",
+          "tone": "good"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Active tasks",
+      "value": "12",
+      "detail": "+4 completed in last hour",
+      "tone": "good",
+      "sparkline": [
+        6,
+        7,
+        9,
+        8,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "type": "checklist",
+      "title": "Mitigation steps",
+      "items": [
+        {
+          "id": "shift-batch",
+          "label": "Shift batch evals to secondary profile",
+          "checked": true
+        },
+        {
+          "id": "verify_p95",
+          "label": "Confirm p95 latency stays below 130 ms",
+          "checked": false
+        }
+      ]
+    }
+  ]
+}

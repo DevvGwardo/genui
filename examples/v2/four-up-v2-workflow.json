@@ -1,0 +1,116 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "kanban",
+      "title": "Sprint 42 rollout board",
+      "columns": [
+        {
+          "name": "Queued",
+          "items": [
+            {
+              "title": "Cut v2.0.0 release tag",
+              "tag": "release",
+              "tone": "neutral"
+            }
+          ]
+        },
+        {
+          "name": "In Review",
+          "items": [
+            {
+              "title": "Audit 22-widget schema bounds",
+              "tag": "security",
+              "tone": "warn"
+            }
+          ]
+        },
+        {
+          "name": "Shipped",
+          "items": [
+            {
+              "title": "Batch JSONL validator pipeline",
+              "tag": "perf",
+              "tone": "good"
+            },
+            {
+              "title": "Safe DOM preview renderer",
+              "tag": "ui",
+              "tone": "good"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "log_stream",
+      "title": "MCP dispatch audit tail",
+      "entries": [
+        {
+          "time": "14:44:02",
+          "level": "good",
+          "source": "dispatch",
+          "message": "minted genuiOccurrence 8a3f-91c2 (884 B)"
+        },
+        {
+          "time": "14:44:09",
+          "level": "warn",
+          "source": "rate-limit",
+          "message": "us-east-2 pool reached 91% hourly token budget"
+        },
+        {
+          "time": "14:44:15",
+          "level": "info",
+          "source": "router",
+          "message": "shifted batch eval queue to secondary profile"
+        },
+        {
+          "time": "14:44:21",
+          "level": "good",
+          "source": "validator",
+          "message": "verified 22-widget v2 schema parity in 4ms"
+        }
+      ]
+    },
+    {
+      "type": "diff_list",
+      "title": "Canary config delta",
+      "items": [
+        {
+          "key": "max-concurrency",
+          "before": "16 workers",
+          "after": "32 workers",
+          "tone": "good"
+        },
+        {
+          "key": "retry-backoff",
+          "before": "1500 ms",
+          "after": "750 ms",
+          "tone": "warn"
+        },
+        {
+          "key": "catalog-version",
+          "before": "v1 (4 widgets)",
+          "after": "v2 (22 widgets)",
+          "tone": "good"
+        }
+      ]
+    },
+    {
+      "type": "checklist",
+      "title": "Sign-off gates",
+      "items": [
+        {
+          "id": "verify-22w",
+          "label": "Verify all 22 v2 widget schemas",
+          "checked": true
+        },
+        {
+          "id": "run-ci-suite",
+          "label": "Run 15-gate local CI suite",
+          "checked": true
+        }
+      ]
+    }
+  ]
+}

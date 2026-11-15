@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "heatmap",
+      "title": "Error density by region & window",
+      "unit": "err/min",
+      "xLabels": [
+        "00-06",
+        "06-12",
+        "12-18",
+        "18-24"
+      ],
+      "yLabels": [
+        "us-east",
+        "eu-west",
+        "ap-east"
+      ],
+      "cells": [
+        [
+          1,
+          3,
+          9,
+          4
+        ],
+        [
+          2,
+          6,
+          4,
+          1
+        ],
+        [
+          7,
+          2,
+          1,
+          3
+        ]
+      ]
+    }
+  ]
+}

@@ -88,6 +88,17 @@ def rejectconst(token):
     raise ValueError("non-finite JSON constant: " + token)
 
 
+def compactbytes(payload):
+    return len(
+        json.dumps(
+            payload,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            allow_nan=False,
+        ).encode("utf-8")
+    )
+
+
 def depthcheck(rootval):
     stack = [(rootval, 0, "")]
     while stack:
@@ -342,14 +353,7 @@ def check(payload):
             "preflightRule": preflight("not", "string filter", astral[0]["pointer"]),
         }
     try:
-        size = len(
-            json.dumps(
-                payload,
-                separators=(",", ":"),
-                ensure_ascii=False,
-                allow_nan=False,
-            ).encode("utf-8")
-        )
+        size = compactbytes(payload)
     except UnicodeEncodeError:
         return {
             "ok": False,
@@ -429,14 +433,14 @@ def main(args):
     files = []
     for arg in args:
         if arg in ("-h", "--help") and not files and not jsonmode and not jsonlmode:
-            print("usage: python3 tools/validate.py [--json] FILE [FILE ...]")
+            print("usage: python3 tools/validate.py [--json] FILE|- [FILE ...]")
             return 0
         if arg == "--json" and not files and not jsonlmode:
             jsonmode = True
         elif arg == "--jsonl" and not files and not jsonmode:
             jsonlmode = True
         elif arg.startswith("-") and arg != "-":
-            print("usage: python3 tools/validate.py [--json] FILE [FILE ...]", file=sys.stderr)
+            print("usage: python3 tools/validate.py [--json] FILE|- [FILE ...]", file=sys.stderr)
             return 2
         else:
             files.append(arg)
@@ -465,8 +469,11 @@ def main(args):
     bad = 0
     for path in files:
         try:
-            with open(path, "rb") as fh:
-                rawbytes = fh.read()
+            if path == "-":
+                rawbytes = sys.stdin.buffer.read()
+            else:
+                with open(path, "rb") as fh:
+                    rawbytes = fh.read()
         except OSError as err:
             if jsonmode:
                 rec = {

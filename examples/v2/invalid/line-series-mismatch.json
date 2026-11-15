@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "line_chart",
+      "title": "Latency",
+      "xLabels": [
+        "08:00",
+        "10:00",
+        "12:00"
+      ],
+      "series": [
+        {
+          "name": "p95",
+          "values": [
+            120,
+            115
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -59,6 +59,9 @@ jobs:
           node tools/check-docs-budget.mjs
           python3 tools/check-examples.py
           python3 tools/check-doc-payloads.py
+          python3 tools/check-prune.py
+          node tools/check-preview.mjs
+          python3 tools/uphill-eval.py
           node tools/fuzz-validator.mjs
           node tools/check-evals.mjs
           node tools/check-upstream.mjs

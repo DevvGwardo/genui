@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "kanban",
+      "title": "Sprint 42 rollout board",
+      "columns": [
+        {
+          "name": "Queued",
+          "items": [
+            {
+              "title": "Cut v2.0.0 release tag",
+              "tag": "release",
+              "tone": "neutral"
+            }
+          ]
+        },
+        {
+          "name": "In Review",
+          "items": [
+            {
+              "title": "Audit 22-widget schema bounds",
+              "tag": "security",
+              "tone": "warn"
+            }
+          ]
+        },
+        {
+          "name": "Shipped",
+          "items": [
+            {
+              "title": "Batch JSONL validator pipeline",
+              "tag": "perf",
+              "tone": "good"
+            },
+            {
+              "title": "Safe DOM preview renderer",
+              "tag": "ui",
+              "tone": "good"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

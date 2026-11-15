@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "stacked_bar",
+      "title": "Traffic",
+      "segments": [
+        "ok",
+        "err",
+        "cached"
+      ],
+      "rows": [
+        {
+          "label": "us-east",
+          "values": [
+            90,
+            10
+          ]
+        }
+      ]
+    }
+  ]
+}

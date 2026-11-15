@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "diff_list",
+      "title": "Canary config delta",
+      "items": [
+        {
+          "key": "max-concurrency",
+          "before": "16 workers",
+          "after": "32 workers",
+          "tone": "good"
+        },
+        {
+          "key": "retry-backoff-ms",
+          "before": "1500 ms",
+          "after": "750 ms",
+          "tone": "warn"
+        },
+        {
+          "key": "schema-version",
+          "before": "v1 (4 widgets)",
+          "after": "v2 (16 widgets)",
+          "tone": "good"
+        }
+      ]
+    }
+  ]
+}

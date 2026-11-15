@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "progress_list",
+      "title": "Quota",
+      "items": [
+        {
+          "label": "GPU",
+          "value": 10,
+          "max": 0
+        }
+      ]
+    }
+  ]
+}

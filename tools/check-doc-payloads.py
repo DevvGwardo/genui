@@ -4,8 +4,7 @@
 Every fenced ```json payload in the docs is a claim that it is a valid
 `render_ui` argument. This tool extracts those payloads from the two files that
 show them to users - `README.md` and `skills/genui/SKILL.md` - and puts each one
-through `tools/validate.py`, the validator of record. A doc example that drifts
-away from `schema/v1.json` therefore fails CI instead of shipping.
+through `tools/validate.py`, the validator of record (batched via --jsonl).
 
 The per-file payload counts are asserted in both directions, the same way
 `tools/check-examples.py` asserts its fixture set: a payload cannot be added or
@@ -19,7 +18,6 @@ import json
 import re
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -42,30 +40,27 @@ def payloads(text):
     return out
 
 
-def validate(source, label):
-    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as fh:
-        fh.write(source)
-        tmp = Path(fh.name)
-    try:
-        run = subprocess.run(
-            [sys.executable, str(VALIDATOR), str(tmp)],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
+def batchvalidate(sources):
+    if not sources:
+        return []
+    lines = [json.dumps(src, ensure_ascii=True) for src in sources]
+    run = subprocess.run(
+        [sys.executable, str(VALIDATOR), "--jsonl"],
+        input=("\n".join(lines) + "\n").encode("utf-8"),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    out = [ln for ln in run.stdout.decode("utf-8").splitlines() if ln.strip()]
+    if len(out) != len(sources):
+        raise RuntimeError(
+            f"validator --jsonl returned {len(out)} lines for {len(sources)} payloads: {run.stderr.decode('utf-8', errors='replace')}"
         )
-    finally:
-        try:
-            tmp.unlink()
-        except OSError:
-            pass
-    line = (run.stdout or run.stderr or "").strip().splitlines()
-    detail = line[-1].replace(str(tmp), label) if line else "validator produced no output"
-    return run.returncode == 0, detail
+    return [json.loads(ln) for ln in out]
 
 
 def main():
     failures = []
-    checked = 0
+    items = []
     for rel, expected in DOCS.items():
         path = ROOT / rel
         if not path.exists():
@@ -85,11 +80,22 @@ def main():
             except ValueError as err:
                 failures.append(label + ": unparseable JSON: " + str(err))
                 continue
-            ok, detail = validate(source, label)
-            checked += 1
-            print(("  ok   " if ok else "  FAIL ") + label + " (payload " + str(index) + ") -> " + detail)
-            if not ok:
-                failures.append(label + ": " + detail)
+            items.append((label, index, source))
+
+    verdicts = batchvalidate([src for _, _, src in items])
+    checked = 0
+    for (label, index, _), rec in zip(items, verdicts):
+        checked += 1
+        ok = bool(rec["ok"])
+        if ok:
+            detail = label + ": valid"
+        else:
+            code = rec["code"] or "none"
+            tail = " at " + rec["pointer"] if rec.get("pointer") else ""
+            detail = label + ": invalid code=" + code + " reason=" + str(rec["reason"]) + tail
+        print(("  ok   " if ok else "  FAIL ") + label + " (payload " + str(index) + ") -> " + detail)
+        if not ok:
+            failures.append(label + ": " + detail)
 
     print()
     if failures:

@@ -16,6 +16,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { pickPython } from "./lib/python.mjs";
 
 const { spawnSync } = await import("node:" + ["child", "process"].join("_"));
 
@@ -33,27 +34,6 @@ const REQUIRED_NEGATIVE_REASONS = [
 const VALID_CATEGORIES = new Set(["widget", "layout", "pruning", "negative"]);
 const HTML_OR_URI_RE =
   /[<>]|\/\/|(?:https?|file|data|javascript|vbscript):/i;
-
-function pickPython() {
-  const candidates =
-    process.platform === "win32"
-      ? [
-          { cmd: "py", prefix: ["-3"] },
-          { cmd: "python3", prefix: [] },
-          { cmd: "python", prefix: [] },
-        ]
-      : [
-          { cmd: "python3", prefix: [] },
-          { cmd: "python", prefix: [] },
-        ];
-  for (const cand of candidates) {
-    const probe = spawnSync(cand.cmd, [...cand.prefix, validatorFile, "--help"], {
-      encoding: "utf8",
-    });
-    if (!probe.error && probe.status === 0) return cand;
-  }
-  return null;
-}
 
 function collectStrings(node, out = []) {
   if (typeof node === "string") {
@@ -226,7 +206,7 @@ for (const reason of REQUIRED_NEGATIVE_REASONS) {
 }
 
 // Stage-1: validate every positive payload through tools/validate.py
-const pyRunner = pickPython();
+const pyRunner = pickPython(validatorFile);
 if (!pyRunner) {
   problems.push("cannot locate Python 3 interpreter to run tools/validate.py");
 } else if (positiveCases.length > 0) {

@@ -230,9 +230,24 @@ console.log(`  anchors: ${anchors} checked`);
 
 if (checkExternal) {
   let extFailed = 0;
-  console.log(`  external URLs: checking ${externalRefs.size} unique http(s) target(s) (timeout ${timeoutMs}ms)`);
-  for (const [url, refs] of [...externalRefs].sort(([a], [b]) => a.localeCompare(b))) {
-    const result = await probeUrl(url);
+  const entries = [...externalRefs].sort(([a], [b]) => a.localeCompare(b));
+  const concurrency = Math.min(4, Math.max(1, entries.length));
+  const results = new Array(entries.length);
+  let cursor = 0;
+  console.log(
+    `  external URLs: checking ${entries.length} unique http(s) target(s) (timeout ${timeoutMs}ms, concurrency ${concurrency})`
+  );
+  await Promise.all(
+    Array.from({ length: concurrency }, async () => {
+      while (cursor < entries.length) {
+        const idx = cursor++;
+        results[idx] = await probeUrl(entries[idx][0]);
+      }
+    })
+  );
+  for (let i = 0; i < entries.length; i++) {
+    const [url, refs] = entries[i];
+    const result = results[i];
     if (result.ok) {
       console.log(`    ok   ${result.status} ${url}`);
     } else {

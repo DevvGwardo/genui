@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "metric_grid",
+      "title": "Service level objectives",
+      "items": [
+        {
+          "label": "Availability",
+          "value": "99.98%",
+          "delta": "+0.03% vs target",
+          "tone": "good"
+        },
+        {
+          "label": "Apdex score",
+          "value": "0.96",
+          "delta": "steady (7d)",
+          "tone": "neutral"
+        },
+        {
+          "label": "Error budget",
+          "value": "84%",
+          "delta": "16% consumed",
+          "tone": "good"
+        },
+        {
+          "label": "MTTR",
+          "value": "4m 12s",
+          "delta": "-1m 40s vs Q3",
+          "tone": "good"
+        }
+      ]
+    }
+  ]
+}

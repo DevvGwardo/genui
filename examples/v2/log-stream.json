@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "log_stream",
+      "title": "MCP dispatch audit tail",
+      "entries": [
+        {
+          "time": "14:44:02",
+          "level": "good",
+          "source": "dispatch",
+          "message": "minted genuiOccurrence 8a3f-91c2 (884 B)"
+        },
+        {
+          "time": "14:44:09",
+          "level": "warn",
+          "source": "rate-limit",
+          "message": "us-east-2 pool reached 91% hourly token budget"
+        },
+        {
+          "time": "14:44:15",
+          "level": "info",
+          "source": "router",
+          "message": "shifted batch eval queue to secondary profile"
+        },
+        {
+          "time": "14:44:21",
+          "level": "good",
+          "source": "validator",
+          "message": "verified 22-widget v2 schema parity in 4ms"
+        }
+      ]
+    }
+  ]
+}

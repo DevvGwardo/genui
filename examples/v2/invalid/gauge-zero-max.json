@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "gauge",
+      "title": "SLO",
+      "value": 50,
+      "max": 0
+    }
+  ]
+}

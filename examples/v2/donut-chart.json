@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "donut_chart",
+      "title": "Compute spend by workload",
+      "unit": "USD",
+      "centerLabel": "18.4k total",
+      "items": [
+        {
+          "label": "Inference",
+          "value": 9800
+        },
+        {
+          "label": "Training",
+          "value": 5200
+        },
+        {
+          "label": "Storage",
+          "value": 2100
+        },
+        {
+          "label": "Network",
+          "value": 1300
+        }
+      ]
+    }
+  ]
+}

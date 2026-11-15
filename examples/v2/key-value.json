@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "key_value",
+      "title": "Build environment",
+      "items": [
+        {
+          "key": "Profile",
+          "value": "production-us-east",
+          "tone": "good"
+        },
+        {
+          "key": "Runtime",
+          "value": "Node 20.18 + Python 3.12",
+          "tone": "neutral"
+        },
+        {
+          "key": "Commit",
+          "value": "cb91d83 (signed)",
+          "tone": "neutral"
+        },
+        {
+          "key": "Drift",
+          "value": "0 watched paths ahead",
+          "tone": "good"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "gauge",
+      "title": "Monthly error budget remaining",
+      "value": 84,
+      "max": 100,
+      "unit": "%",
+      "detail": "36.2m of 43.2m allowed downtime remaining",
+      "tone": "good"
+    }
+  ]
+}
