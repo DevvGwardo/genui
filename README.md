@@ -8,16 +8,18 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License: MIT"></a>
   <a href="schema/v1.json"><img src="https://img.shields.io/badge/version-v1-blue" alt="Contract version: v1"></a>
+  <a href="schema/v2.json"><img src="https://img.shields.io/badge/catalog-v2-22_widgets-8957e5" alt="Component catalog: v2 — 22 widgets"></a>
   <a href="https://github.com/DevvGwardo/genui/commits/main"><img src="https://img.shields.io/github/last-commit/DevvGwardo/genui" alt="Last commit"></a>
 </p>
 
-A [Hermes Agent](https://github.com/NousResearch/hermes-agent) skill for rendering bounded, data-only Generated UI cards — stat cards, tables, bar charts, and checklists — natively inside [Hermes Desk](https://github.com/DevvGwardo/hermes-desk) conversations via the `mcp__hermes_desk__render_ui` MCP tool.
+A [Hermes Agent](https://github.com/NousResearch/hermes-agent) skill for rendering bounded, data-only Generated UI cards — stat cards, tables, bar charts, and checklists — natively inside [Hermes Desk](https://github.com/DevvGwardo/hermes-desk) conversations via the `mcp__hermes_desk__render_ui` MCP tool. A 22-widget v2 component catalog is staged alongside it — see [Component catalog (v2)](#component-catalog-v2).
 
 No HTML. No `::preview` iframes. Just native, accessible data widgets that render straight into the chat surface.
 
 ## Contents
 
 - [What it renders](#what-it-renders)
+- [Component catalog (v2)](#component-catalog-v2)
 - [How it works](#how-it-works)
 - [Install](#install)
 - [Prerequisites](#prerequisites)
@@ -39,6 +41,60 @@ No HTML. No `::preview` iframes. Just native, accessible data widgets that rende
 | `checklist` | 1–20 items with unique ids and checked state (user-local notes only) |
 
 Rendered blocks are labeled by Hermes Desk as **Generated UI · Agent-provided data, not verified** — they are presentation, not proof.
+
+## Component catalog (v2)
+
+The four widgets above are the complete v1 payload contract — what `render_ui` dispatches today. The v2 catalog is the staged next generation of the design: 22 widget types covering all 25 agent-UI intent archetypes, selected by deterministic uphill evaluation with [`schema/v1.json`](schema/v1.json) kept frozen.
+
+The catalog is fully tooled — schema, validator, fixtures, and a local previewer — but not yet dispatched to Hermes Desk: a `version: 2` payload sent to `render_ui` today is rejected by the unknown-version fallback in [`docs/contract.md`](docs/contract.md).
+
+<p align="center">
+  <img src="docs/v2-preview.webp" alt="genui v2 component catalog — Bento preview (dark)" width="100%">
+</p>
+
+| Artifact | What it is |
+|---|---|
+| [`schema/v2.json`](schema/v2.json) | Strict JSON Schema 2020-12 contract — same hard caps as v1 (1–4 components, ≤ 16,384 bytes) |
+| [`tools/validate-v2.py`](tools/validate-v2.py) | Validator of record for v2 payloads |
+| [`examples/v2/`](examples/v2/) | 36 fixtures — 25 valid, 11 invalid |
+| [`tools/preview.mjs`](tools/preview.mjs) | Zero-dependency dark/light Bento previewer; `--showcase` renders all 22 widgets in 7 presets |
+| [`tools/prune.py`](tools/prune.py) | Deterministic byte-cap pruner for v1 and v2 payloads |
+
+Try the design locally:
+
+```bash
+node tools/preview.mjs --showcase                              # all 22 widgets, 7 presets
+node tools/preview.mjs examples/v2/four-up-v2-executive.json  # one payload, dark/light
+python3 tools/uphill-eval.py                                   # catalog + UI evaluation
+node tools/run-checks.mjs                                      # full 14-check gate
+```
+
+The 22 widget types (v1 widgets are marked):
+
+| Widget | Use for |
+|---|---|
+| `stat` **v1** | Headline KPI with delta |
+| `table` **v1** | Multi-column comparison matrix |
+| `bar_chart` **v1** | Ranked categorical comparison |
+| `checklist` **v1** | Interactive user-local runbook |
+| `line_chart` | Multi-series temporal trend |
+| `donut_chart` | Part-to-whole composition |
+| `key_value` | Structured entity attribute sheet |
+| `progress_list` | Bounded quota/capacity utilization |
+| `timeline` | Ordered incident/rollout events |
+| `alert` | Severity-graded status banner |
+| `metric_grid` | Compact 2–6 KPI tile grid |
+| `status_grid` | Multi-service health tile matrix |
+| `funnel_chart` | Sequential stage drop-off |
+| `heatmap` | 2D numeric intensity matrix |
+| `diff_list` | Before → after state diff |
+| `gauge` | Radial dial against a target maximum |
+| `treemap` | Proportional allocation across groups |
+| `stacked_bar` | Stacked composition per row |
+| `radar_chart` | Multi-axis benchmark scorecard |
+| `log_stream` | Severity-tagged log tail |
+| `kanban` | Multi-column stage board |
+| `slo_burn` | SLO error-budget burn rate |
 
 ## How it works
 
