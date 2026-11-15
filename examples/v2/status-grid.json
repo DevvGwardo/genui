@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "status_grid",
+      "title": "Regional cell health",
+      "items": [
+        {
+          "name": "us-east-1",
+          "status": "good",
+          "meta": "32 ms"
+        },
+        {
+          "name": "us-east-2",
+          "status": "warn",
+          "meta": "91% quota"
+        },
+        {
+          "name": "us-west-2",
+          "status": "good",
+          "meta": "41 ms"
+        },
+        {
+          "name": "eu-west-1",
+          "status": "good",
+          "meta": "58 ms"
+        },
+        {
+          "name": "eu-central-1",
+          "status": "good",
+          "meta": "62 ms"
+        },
+        {
+          "name": "ap-northeast-1",
+          "status": "good",
+          "meta": "79 ms"
+        }
+      ]
+    }
+  ]
+}

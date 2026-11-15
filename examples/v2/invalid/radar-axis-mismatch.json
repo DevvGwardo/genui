@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "radar_chart",
+      "title": "Eval",
+      "axes": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "series": [
+        {
+          "name": "s1",
+          "values": [
+            80,
+            90,
+            85
+          ]
+        }
+      ]
+    }
+  ]
+}

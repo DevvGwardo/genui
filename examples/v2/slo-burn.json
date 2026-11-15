@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "slo_burn",
+      "title": "API availability burn rate",
+      "target": "99.95% (30d)",
+      "budgetRemainingPct": 84.2,
+      "windows": [
+        {
+          "window": "1h fast burn",
+          "burnRate": 0.8,
+          "threshold": 14.4,
+          "tone": "good"
+        },
+        {
+          "window": "6h medium burn",
+          "burnRate": 1.4,
+          "threshold": 6.0,
+          "tone": "good"
+        },
+        {
+          "window": "24h slow burn",
+          "burnRate": 1.9,
+          "threshold": 3.0,
+          "tone": "warn"
+        },
+        {
+          "window": "72h trend",
+          "burnRate": 0.6,
+          "threshold": 1.0,
+          "tone": "good"
+        }
+      ]
+    }
+  ]
+}

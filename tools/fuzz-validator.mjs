@@ -16,6 +16,7 @@ import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "n
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { pickPython } from "./lib/python.mjs";
 
 const { spawnSync } = await import("node:child" + "_process");
 
@@ -746,24 +747,11 @@ function buildCases() {
 }
 
 function detectPython() {
-  const candidates =
-    process.platform === "win32"
-      ? [
-          ["py", ["-3"]],
-          ["python", []],
-          ["python3", []],
-        ]
-      : [
-          ["python3", []],
-          ["python", []],
-        ];
-  for (const [cmd, prefix] of candidates) {
-    const res = spawnSync(cmd, [...prefix, "-c", "import sys; assert sys.hexversion >= 0x03000000"], {
-      encoding: "utf8",
-    });
-    if (res.status === 0) return { cmd, prefix };
+  const found = pickPython(validatorPath);
+  if (!found) {
+    throw new Error("Could not locate a working Python 3 interpreter (tried py -3 / python3 / python)");
   }
-  throw new Error("Could not locate a working Python 3 interpreter (tried py -3 / python3 / python)");
+  return found;
 }
 
 function runPythonStream(py, cases) {

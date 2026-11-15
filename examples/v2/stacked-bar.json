@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "stacked_bar",
+      "title": "Request outcomes by region",
+      "unit": "k req",
+      "segments": [
+        "2xx OK",
+        "4xx Cached",
+        "5xx Error"
+      ],
+      "rows": [
+        {
+          "label": "us-east",
+          "values": [
+            84,
+            14,
+            2
+          ]
+        },
+        {
+          "label": "eu-west",
+          "values": [
+            62,
+            11,
+            1
+          ]
+        },
+        {
+          "label": "ap-east",
+          "values": [
+            45,
+            9,
+            1
+          ]
+        }
+      ]
+    }
+  ]
+}

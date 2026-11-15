@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "timeline",
+      "title": "Release rollout",
+      "items": [
+        {
+          "time": "14:02 UTC",
+          "title": "Canary 5% healthy",
+          "detail": "0 error spikes across 3 regions",
+          "tone": "good"
+        },
+        {
+          "time": "14:20 UTC",
+          "title": "Traffic shifted to 50%",
+          "detail": "p95 latency steady at 118 ms",
+          "tone": "good"
+        },
+        {
+          "time": "14:45 UTC",
+          "title": "Full production promotion",
+          "detail": "All 14 gates verified",
+          "tone": "neutral"
+        }
+      ]
+    }
+  ]
+}

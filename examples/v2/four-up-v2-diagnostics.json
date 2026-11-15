@@ -1,0 +1,101 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "heatmap",
+      "title": "Error density by region & window",
+      "unit": "err/min",
+      "xLabels": [
+        "00-06",
+        "06-12",
+        "12-18",
+        "18-24"
+      ],
+      "yLabels": [
+        "us-east",
+        "eu-west",
+        "ap-east"
+      ],
+      "cells": [
+        [
+          1,
+          3,
+          9,
+          4
+        ],
+        [
+          2,
+          6,
+          4,
+          1
+        ],
+        [
+          7,
+          2,
+          1,
+          3
+        ]
+      ]
+    },
+    {
+      "type": "diff_list",
+      "title": "Canary config delta",
+      "items": [
+        {
+          "key": "max-concurrency",
+          "before": "16 workers",
+          "after": "32 workers",
+          "tone": "good"
+        },
+        {
+          "key": "retry-backoff",
+          "before": "1500 ms",
+          "after": "750 ms",
+          "tone": "warn"
+        },
+        {
+          "key": "catalog-version",
+          "before": "v1 (4 widgets)",
+          "after": "v2 (16 widgets)",
+          "tone": "good"
+        }
+      ]
+    },
+    {
+      "type": "key_value",
+      "title": "Build environment",
+      "items": [
+        {
+          "key": "Profile",
+          "value": "production-us-east",
+          "tone": "good"
+        },
+        {
+          "key": "Runtime",
+          "value": "Node 20.18 + Python 3.12",
+          "tone": "neutral"
+        },
+        {
+          "key": "Commit",
+          "value": "cb91d83 (signed)",
+          "tone": "neutral"
+        },
+        {
+          "key": "Drift",
+          "value": "0 watched paths ahead",
+          "tone": "good"
+        }
+      ]
+    },
+    {
+      "type": "alert",
+      "title": "Rate limit threshold approaching",
+      "severity": "warn",
+      "message": "Worker pool us-east-2 is at 91% of hourly token quota.",
+      "items": [
+        "Batch non-urgent eval runs onto the secondary profile",
+        "Quota resets in 18 minutes at 15:00 UTC"
+      ]
+    }
+  ]
+}

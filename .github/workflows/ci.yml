@@ -52,6 +52,15 @@ jobs:
       - name: Validate payloads embedded in README and SKILL.md
         run: python3 tools/check-doc-payloads.py
 
+      - name: Run deterministic byte-cap pruner suite
+        run: python3 tools/check-prune.py
+
+      - name: Run component previewer suite
+        run: node tools/check-preview.mjs
+
+      - name: Run uphill catalog and UI evaluation suite
+        run: python3 tools/uphill-eval.py
+
       - name: Run differential validator fuzzer
         run: node tools/fuzz-validator.mjs
 

@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "alert",
+      "title": "Rate limit threshold approaching",
+      "severity": "warn",
+      "message": "Worker pool us-east-2 is at 91% of hourly token quota.",
+      "items": [
+        "Batch non-urgent eval runs onto the secondary profile",
+        "Quota resets in 18 minutes at 15:00 UTC"
+      ]
+    }
+  ]
+}

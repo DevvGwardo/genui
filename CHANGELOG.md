@@ -6,6 +6,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)-style sections,
 
 ## Unreleased
 
+- feat(J8): expand `schema/v2.json`, `tools/validate-v2.py`, `tools/prune.py`, `tools/preview.mjs`, and `tools/uphill-eval.py` with 6 additional components (`treemap`, `stacked_bar`, `radar_chart`, `log_stream`, `kanban`, `slo_burn` -> 22 total widgets covering 25/25 archetypes), 8 new valid + 3 invalid v2 fixtures (36 total), and a 7-preset interactive `--showcase`.
+- feat(J7): expand `schema/v2.json`, `tools/validate-v2.py`, `tools/prune.py`, `tools/preview.mjs`, and `tools/uphill-eval.py` with 6 additional components (`metric_grid`, `status_grid`, `funnel_chart`, `heatmap`, `diff_list`, `gauge` -> 16 total widgets covering 19/19 archetypes), 8 new valid + 2 invalid v2 fixtures (25 total), a 5-preset interactive `--showcase`, and Stage 4 in `uphill-ui-comparison.png` (98.75/100).
+- feat(J6): extend uphill evaluation to 13 archetypes (`stat.sparkline` micro-trend), add 6 adversarial `examples/v2/invalid/*.json` fixtures, extend `tools/prune.py` to prune v2 payloads deterministically, add `--showcase` multi-preset switcher to `tools/preview.mjs`, and upgrade `uphill-ui-comparison.png` to a 4-stage `2x2` dark/light comparison board (60.87 -> 90.95 -> 97.05 -> 98.05).
+- feat(J5): add `tools/uphill-eval.py` (deterministic uphill evaluation for component catalog expansion + UI screenshot comparison), `schema/v2.json` + `tools/validate-v2.py` (10 widgets covering 100% of 12 agent UI archetypes: adds `line_chart`, `donut_chart`, `key_value`, `progress_list`, `timeline`, `alert`), 8 `examples/v2/*.json` fixtures, and v2 support in `tools/preview.mjs`.
+- feat(J4): add `tools/preview.mjs` (zero-dependency, XSS-safe dark/light HTML5 Bento component previewer with `tabular-nums`, semantic `stat` delta pills, numeric-aligned `table` columns, proportional `bar_chart` bars, and `localStorage` `checklist` progress) + `tools/check-preview.mjs`, and add `Designing High-Signal Cards` guidance to `skills/genui/SKILL.md`.
+- feat(J1): add `tools/prune.py` (executable 6-step deterministic byte-cap pruner with `--cap`, `--json`, `--check`, `--in-place`, and `-` stdin) and `tools/check-prune.py` (6/6 assertions), wired into CI and release workflows.
+- perf(J2): fix `-` (stdin) reading in `tools/validate.py`, share `compactbytes`, and refactor `tools/check-examples.py` + `tools/check-doc-payloads.py` to batch through a single `--jsonl` subprocess (0.867s -> 0.117s, 7.4x faster).
+- refactor(J3): add `tools/run-checks.mjs` unified 13-check local CI runner (`--fast`, `--filter`, `--json`, `--fail-fast`), extract shared `tools/lib/python.mjs` (`pickPython`), and add bounded concurrency (4) to `tools/check-links.mjs --external`.
+
 ## [1.1.0] - 2026-11-12
 
 - test(G1): add `tools/fuzz-validator.mjs` — zero-dependency Node reference validator and deterministic seeded PRNG generator testing 5,576 payloads against `tools/validate.py` with 0 verdict divergences; wired into CI.

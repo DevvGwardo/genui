@@ -37,7 +37,13 @@ Tracked peer and upstream sources live in [`upstream/sources.json`](upstream/sou
 
 ## Committed checks
 
-Run the full set from the repository root (Node 20+ and `python3` are required; on Windows use `py -3` for Python commands):
+Run the full set in one command from the repository root (Node 20+ and `python3` are required; on Windows `py -3` is auto-detected):
+
+```bash
+node tools/run-checks.mjs
+```
+
+Pass `--fast` to skip the 5,576-case differential fuzzer during rapid edits. The individual commands (canonical list in `.github/workflows/ci.yml`):
 
 ```bash
 node tools/check-bounds.mjs
@@ -48,6 +54,9 @@ node tools/check-links.mjs
 node tools/check-docs-budget.mjs
 python3 tools/check-examples.py
 python3 tools/check-doc-payloads.py
+python3 tools/check-prune.py
+node tools/check-preview.mjs
+python3 tools/uphill-eval.py
 node tools/fuzz-validator.mjs
 node tools/check-evals.mjs
 node tools/check-upstream.mjs
@@ -56,7 +65,7 @@ python3 tools/package-skill.py --verify
 
 For live external URL verification (run weekly in `.github/workflows/links-external.yml`), run `node tools/check-links.mjs --external`.
 
-CI (`.github/workflows/ci.yml`) runs the twelve checks above on every push and pull request — the workflow is the canonical list. A change that leaves any check red is not ready. When a check has real gaps, extend it — do not add a parallel one-off gate.
+CI (`.github/workflows/ci.yml`) runs the fifteen checks above on every push and pull request — the workflow is the canonical list. A change that leaves any check red is not ready. When a check has real gaps, extend it — do not add a parallel one-off gate.
 
 ## Commit and PR style
 

@@ -1,0 +1,1219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/DevvGwardo/genui/main/schema/v2.json",
+  "title": "Hermes Desk render_ui payload (v2)",
+  "description": "Strict v2 contract for bounded, data-only Generated UI cards (22 widget types: stat, table, bar_chart, checklist, line_chart, donut_chart, key_value, progress_list, timeline, alert, metric_grid, status_grid, funnel_chart, heatmap, diff_list, gauge, treemap, stacked_bar, radar_chart, log_stream, kanban, slo_burn). Selected via Uphill Catalog Evaluation while keeping schema/v1.json frozen.",
+  "type": "object",
+  "required": [
+    "version",
+    "components"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": 2,
+      "description": "Schema version. Only 2 is accepted by schema/v2.json."
+    },
+    "components": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/stat"
+          },
+          {
+            "$ref": "#/$defs/table"
+          },
+          {
+            "$ref": "#/$defs/bar_chart"
+          },
+          {
+            "$ref": "#/$defs/checklist"
+          },
+          {
+            "$ref": "#/$defs/line_chart"
+          },
+          {
+            "$ref": "#/$defs/donut_chart"
+          },
+          {
+            "$ref": "#/$defs/key_value"
+          },
+          {
+            "$ref": "#/$defs/progress_list"
+          },
+          {
+            "$ref": "#/$defs/timeline"
+          },
+          {
+            "$ref": "#/$defs/alert"
+          },
+          {
+            "$ref": "#/$defs/metric_grid"
+          },
+          {
+            "$ref": "#/$defs/status_grid"
+          },
+          {
+            "$ref": "#/$defs/funnel_chart"
+          },
+          {
+            "$ref": "#/$defs/heatmap"
+          },
+          {
+            "$ref": "#/$defs/diff_list"
+          },
+          {
+            "$ref": "#/$defs/gauge"
+          },
+          {
+            "$ref": "#/$defs/treemap"
+          },
+          {
+            "$ref": "#/$defs/stacked_bar"
+          },
+          {
+            "$ref": "#/$defs/radar_chart"
+          },
+          {
+            "$ref": "#/$defs/log_stream"
+          },
+          {
+            "$ref": "#/$defs/kanban"
+          },
+          {
+            "$ref": "#/$defs/slo_burn"
+          }
+        ]
+      }
+    }
+  },
+  "$comment": "Runtime-enforced rules mirrored by tools/validate-v2.py: (1) compact UTF-8 size <= 16,384 bytes (too_large); (2) table row width == columns.length; (3) checklist item ids unique within component; (4) line_chart series[].values.length == xLabels.length; (5) progress_list item max > 0; (6) astral-plane format characters rejected.",
+  "$defs": {
+    "plainText": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S",
+      "not": {
+        "anyOf": [
+          {
+            "pattern": "[<>]"
+          },
+          {
+            "pattern": "//"
+          },
+          {
+            "pattern": "(?:[hH][tT][tT][pP][sS]?|[fF][iI][lL][eE]|[dD][aA][tT][aA]|[jJ][aA][vV][aA][sS][cC][rR][iI][pP][tT]|[vV][bB][sS][cC][rR][iI][pP][tT]):"
+          },
+          {
+            "pattern": "[\\u0000-\\u001F\\u007F-\\u009F\\u00AD\\u0600-\\u0605\\u061C\\u06DD\\u070F\\u0890-\\u0891\\u08E2\\u180E\\u200B-\\u200F\\u2028-\\u202E\\u2060-\\u2064\\u2066-\\u206F\\uFEFF\\uFFF9-\\uFFFB]"
+          }
+        ]
+      }
+    },
+    "text40": {
+      "type": "string",
+      "allOf": [
+        {
+          "$ref": "#/$defs/plainText"
+        },
+        {
+          "maxLength": 40
+        }
+      ]
+    },
+    "text60": {
+      "type": "string",
+      "allOf": [
+        {
+          "$ref": "#/$defs/plainText"
+        },
+        {
+          "maxLength": 60
+        }
+      ]
+    },
+    "text80": {
+      "type": "string",
+      "allOf": [
+        {
+          "$ref": "#/$defs/plainText"
+        },
+        {
+          "maxLength": 80
+        }
+      ]
+    },
+    "text160": {
+      "type": "string",
+      "allOf": [
+        {
+          "$ref": "#/$defs/plainText"
+        },
+        {
+          "maxLength": 160
+        }
+      ]
+    },
+    "tone": {
+      "type": "string",
+      "enum": [
+        "neutral",
+        "good",
+        "warn",
+        "bad"
+      ]
+    },
+    "cell": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/text160"
+        },
+        {
+          "type": "number",
+          "minimum": -1000000000000.0,
+          "maximum": 1000000000000.0
+        }
+      ]
+    },
+    "stat": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "value"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "stat"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "value": {
+          "$ref": "#/$defs/text80"
+        },
+        "detail": {
+          "$ref": "#/$defs/text160"
+        },
+        "tone": {
+          "$ref": "#/$defs/tone"
+        },
+        "sparkline": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 24,
+          "items": {
+            "type": "number",
+            "minimum": -1000000000000.0,
+            "maximum": 1000000000000.0
+          }
+        }
+      }
+    },
+    "table": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "columns",
+        "rows"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "table"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "columns": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "items": {
+            "$ref": "#/$defs/text60"
+          }
+        },
+        "rows": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 20,
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/cell"
+            }
+          }
+        }
+      }
+    },
+    "bar_chart": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "items"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "bar_chart"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "unit": {
+          "$ref": "#/$defs/text40"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "required": [
+              "label",
+              "value"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "label": {
+                "$ref": "#/$defs/text80"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000000.0
+              }
+            }
+          }
+        }
+      }
+    },
+    "checklist": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "items"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "checklist"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "label"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9_-]{1,40}$"
+              },
+              "label": {
+                "$ref": "#/$defs/text160"
+              },
+              "checked": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "line_chart": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "xLabels",
+        "series"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "line_chart"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "unit": {
+          "$ref": "#/$defs/text40"
+        },
+        "xLabels": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 24,
+          "items": {
+            "$ref": "#/$defs/text40"
+          }
+        },
+        "series": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "values"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/text60"
+              },
+              "values": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 24,
+                "items": {
+                  "type": "number",
+                  "minimum": -1000000000000.0,
+                  "maximum": 1000000000000.0
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "donut_chart": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "items"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "donut_chart"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "unit": {
+          "$ref": "#/$defs/text40"
+        },
+        "centerLabel": {
+          "$ref": "#/$defs/text60"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "required": [
+              "label",
+              "value"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "label": {
+                "$ref": "#/$defs/text80"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000000.0
+              }
+            }
+          }
+        }
+      }
+    },
+    "key_value": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "items"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "key_value"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "required": [
+              "key",
+              "value"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "$ref": "#/$defs/text60"
+              },
+              "value": {
+                "$ref": "#/$defs/text160"
+              },
+              "tone": {
+                "$ref": "#/$defs/tone"
+              }
+            }
+          }
+        }
+      }
+    },
+    "progress_list": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "items"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "progress_list"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "required": [
+              "label",
+              "value",
+              "max"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "label": {
+                "$ref": "#/$defs/text80"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000000.0
+              },
+              "max": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000000.0
+              },
+              "unit": {
+                "$ref": "#/$defs/text40"
+              },
+              "tone": {
+                "$ref": "#/$defs/tone"
+              }
+            }
+          }
+        }
+      }
+    },
+    "timeline": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "items"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "timeline"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "required": [
+              "time",
+              "title"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "time": {
+                "$ref": "#/$defs/text40"
+              },
+              "title": {
+                "$ref": "#/$defs/text80"
+              },
+              "detail": {
+                "$ref": "#/$defs/text160"
+              },
+              "tone": {
+                "$ref": "#/$defs/tone"
+              }
+            }
+          }
+        }
+      }
+    },
+    "alert": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "severity",
+        "message"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "alert"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "info",
+            "good",
+            "warn",
+            "bad"
+          ]
+        },
+        "message": {
+          "$ref": "#/$defs/text160"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "items": {
+            "$ref": "#/$defs/text160"
+          }
+        }
+      }
+    },
+    "metric_grid": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "items"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "metric_grid"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "required": [
+              "label",
+              "value"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "label": {
+                "$ref": "#/$defs/text60"
+              },
+              "value": {
+                "$ref": "#/$defs/text60"
+              },
+              "delta": {
+                "$ref": "#/$defs/text60"
+              },
+              "tone": {
+                "$ref": "#/$defs/tone"
+              }
+            }
+          }
+        }
+      }
+    },
+    "status_grid": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "items"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "status_grid"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "status"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/text60"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "good",
+                  "warn",
+                  "bad",
+                  "neutral"
+                ]
+              },
+              "meta": {
+                "$ref": "#/$defs/text60"
+              }
+            }
+          }
+        }
+      }
+    },
+    "funnel_chart": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "items"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "funnel_chart"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "unit": {
+          "$ref": "#/$defs/text40"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "required": [
+              "stage",
+              "value"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "stage": {
+                "$ref": "#/$defs/text60"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000000.0
+              }
+            }
+          }
+        }
+      }
+    },
+    "heatmap": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "xLabels",
+        "yLabels",
+        "cells"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "heatmap"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "unit": {
+          "$ref": "#/$defs/text40"
+        },
+        "xLabels": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/text40"
+          }
+        },
+        "yLabels": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/text40"
+          }
+        },
+        "cells": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 8,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 8,
+            "items": {
+              "type": "number",
+              "minimum": -1000000000000.0,
+              "maximum": 1000000000000.0
+            }
+          }
+        }
+      }
+    },
+    "diff_list": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "items"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "diff_list"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "required": [
+              "key",
+              "before",
+              "after"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "$ref": "#/$defs/text60"
+              },
+              "before": {
+                "$ref": "#/$defs/text80"
+              },
+              "after": {
+                "$ref": "#/$defs/text80"
+              },
+              "tone": {
+                "$ref": "#/$defs/tone"
+              }
+            }
+          }
+        }
+      }
+    },
+    "gauge": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "value",
+        "max"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "gauge"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "value": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000.0
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000.0
+        },
+        "unit": {
+          "$ref": "#/$defs/text40"
+        },
+        "detail": {
+          "$ref": "#/$defs/text160"
+        },
+        "tone": {
+          "$ref": "#/$defs/tone"
+        }
+      }
+    },
+    "treemap": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "items"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "treemap"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "unit": {
+          "$ref": "#/$defs/text40"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "required": [
+              "label",
+              "value"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "label": {
+                "$ref": "#/$defs/text60"
+              },
+              "value": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000000.0
+              },
+              "group": {
+                "$ref": "#/$defs/text40"
+              },
+              "tone": {
+                "$ref": "#/$defs/tone"
+              }
+            }
+          }
+        }
+      }
+    },
+    "stacked_bar": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "segments",
+        "rows"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "stacked_bar"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "unit": {
+          "$ref": "#/$defs/text40"
+        },
+        "segments": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 5,
+          "items": {
+            "$ref": "#/$defs/text40"
+          }
+        },
+        "rows": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "required": [
+              "label",
+              "values"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "label": {
+                "$ref": "#/$defs/text60"
+              },
+              "values": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 5,
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000000000.0
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "radar_chart": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "axes",
+        "series"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "radar_chart"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "max": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 1000000000000.0
+        },
+        "axes": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/text40"
+          }
+        },
+        "series": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "values"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/text60"
+              },
+              "values": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 8,
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000000000.0
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "log_stream": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "entries"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "log_stream"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "entries": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "required": [
+              "time",
+              "level",
+              "message"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "time": {
+                "$ref": "#/$defs/text40"
+              },
+              "level": {
+                "type": "string",
+                "enum": [
+                  "info",
+                  "good",
+                  "warn",
+                  "bad"
+                ]
+              },
+              "source": {
+                "$ref": "#/$defs/text40"
+              },
+              "message": {
+                "$ref": "#/$defs/text160"
+              }
+            }
+          }
+        }
+      }
+    },
+    "kanban": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "columns"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "kanban"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "columns": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "items"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/text40"
+              },
+              "items": {
+                "type": "array",
+                "minItems": 0,
+                "maxItems": 8,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "title"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "title": {
+                      "$ref": "#/$defs/text80"
+                    },
+                    "tag": {
+                      "$ref": "#/$defs/text40"
+                    },
+                    "tone": {
+                      "$ref": "#/$defs/tone"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "slo_burn": {
+      "type": "object",
+      "required": [
+        "type",
+        "title",
+        "target",
+        "windows"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "slo_burn"
+        },
+        "title": {
+          "$ref": "#/$defs/text80"
+        },
+        "target": {
+          "$ref": "#/$defs/text40"
+        },
+        "budgetRemainingPct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "windows": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "required": [
+              "window",
+              "burnRate",
+              "threshold"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "window": {
+                "$ref": "#/$defs/text40"
+              },
+              "burnRate": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000.0
+              },
+              "threshold": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000.0
+              },
+              "tone": {
+                "$ref": "#/$defs/tone"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

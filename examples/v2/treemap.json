@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "treemap",
+      "title": "Token footprint by subsystem",
+      "unit": "tokens",
+      "items": [
+        {
+          "label": "Tool schemas",
+          "value": 4200,
+          "group": "mcp",
+          "tone": "warn"
+        },
+        {
+          "label": "Conversation history",
+          "value": 3100,
+          "group": "core",
+          "tone": "neutral"
+        },
+        {
+          "label": "System prompt",
+          "value": 1850,
+          "group": "core",
+          "tone": "good"
+        },
+        {
+          "label": "Skill instructions",
+          "value": 920,
+          "group": "skills",
+          "tone": "good"
+        },
+        {
+          "label": "Memory block",
+          "value": 640,
+          "group": "core",
+          "tone": "neutral"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "progress_list",
+      "title": "Cluster saturation",
+      "items": [
+        {
+          "label": "GPU memory",
+          "value": 68,
+          "max": 80,
+          "unit": "GB",
+          "tone": "warn"
+        },
+        {
+          "label": "NVMe scratch",
+          "value": 410,
+          "max": 1000,
+          "unit": "GB",
+          "tone": "good"
+        },
+        {
+          "label": "Worker slots",
+          "value": 29,
+          "max": 32,
+          "unit": "pods",
+          "tone": "warn"
+        }
+      ]
+    }
+  ]
+}

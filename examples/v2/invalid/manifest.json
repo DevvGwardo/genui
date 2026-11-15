@@ -1,0 +1,59 @@
+{
+  "cases": [
+    {
+      "file": "line-series-mismatch.json",
+      "expectedCode": null,
+      "kind": "series length mismatch"
+    },
+    {
+      "file": "progress-zero-max.json",
+      "expectedCode": null,
+      "kind": "bound violation"
+    },
+    {
+      "file": "invalid-tone-enum.json",
+      "expectedCode": "bad_args",
+      "kind": "invalid enum"
+    },
+    {
+      "file": "invalid-alert-severity.json",
+      "expectedCode": "bad_args",
+      "kind": "invalid enum"
+    },
+    {
+      "file": "sparkline-too-short.json",
+      "expectedCode": null,
+      "kind": "bound violation"
+    },
+    {
+      "file": "unknown-v2-widget.json",
+      "expectedCode": "bad_args",
+      "kind": "unknown widget type"
+    },
+    {
+      "file": "heatmap-dim-mismatch.json",
+      "expectedCode": null,
+      "kind": "heatmap dimension mismatch"
+    },
+    {
+      "file": "gauge-zero-max.json",
+      "expectedCode": null,
+      "kind": "bound violation"
+    },
+    {
+      "file": "stacked-bar-mismatch.json",
+      "expectedCode": null,
+      "kind": "stacked bar segment mismatch"
+    },
+    {
+      "file": "radar-axis-mismatch.json",
+      "expectedCode": null,
+      "kind": "radar axis mismatch"
+    },
+    {
+      "file": "slo-burn-zero-threshold.json",
+      "expectedCode": null,
+      "kind": "bound violation"
+    }
+  ]
+}

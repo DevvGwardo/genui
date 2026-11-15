@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "alert",
+      "title": "Notice",
+      "severity": "urgent",
+      "message": "Invalid severity enum value."
+    }
+  ]
+}

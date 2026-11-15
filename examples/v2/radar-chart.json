@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "radar_chart",
+      "title": "Model scorecard (v2 vs baseline)",
+      "max": 100,
+      "axes": [
+        "Safety",
+        "Latency",
+        "Accuracy",
+        "Cost",
+        "Coverage"
+      ],
+      "series": [
+        {
+          "name": "genui v2",
+          "values": [
+            99,
+            94,
+            96,
+            92,
+            100
+          ]
+        },
+        {
+          "name": "baseline",
+          "values": [
+            82,
+            71,
+            84,
+            68,
+            52
+          ]
+        }
+      ]
+    }
+  ]
+}

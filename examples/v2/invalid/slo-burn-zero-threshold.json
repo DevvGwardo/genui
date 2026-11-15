@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "slo_burn",
+      "title": "Burn",
+      "target": "99.9%",
+      "windows": [
+        {
+          "window": "1h",
+          "burnRate": 1.2,
+          "threshold": 0
+        },
+        {
+          "window": "6h",
+          "burnRate": 1.0,
+          "threshold": 6.0
+        }
+      ]
+    }
+  ]
+}

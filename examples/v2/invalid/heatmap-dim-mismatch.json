@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "components": [
+    {
+      "type": "heatmap",
+      "title": "Matrix",
+      "xLabels": [
+        "a",
+        "b",
+        "c"
+      ],
+      "yLabels": [
+        "r1",
+        "r2"
+      ],
+      "cells": [
+        [
+          1,
+          2
+        ],
+        [
+          3,
+          4
+        ]
+      ]
+    }
+  ]
+}
